@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+	<!-- Header -->
+	<header th:replace="admin/fragment/header :: header"></header>
+
+	<!-- Layout -->
+	<div class="flex pt-14 min-h-screen">
+		<aside th:replace="admin/fragment/aside :: aside"></aside>
+
+		<main class="flex-1 p-6">
+			<div class="flex justify-between items-center mb-4">
+				<h1 class="text-2xl font-semibold">Chỉnh sửa Hot Deal</h1>
+				<a th:href="@{/admin/hotdeal}"
+					class="text-sm text-blue-600 hover:underline">← Quay lại danh
+					sách</a>
+			</div>
+
+			<form th:action="@{'/admin/edit-hotdeal/' + ${hotDeal.id}}"
+				method="post" th:object="${hotDeal}"
+				class="bg-white p-6 rounded shadow-sm text-sm space-y-4">
+				<input type="hidden" th:field="*{id}" />
+
+				<div>
+					<label class="block mb-1 font-medium text-gray-700">Sản
+						phẩm</label> <input type="text" th:value="${hotDeal.product.name}"
+						disabled
+						class="w-full border border-gray-300 px-3 py-2 rounded bg-gray-100" />
+				</div>
+
+				<!-- Ảnh sản phẩm -->
+				<div th:if="${hotDeal.product != null}">
+					<img th:src="@{'/uploads/' + ${hotDeal.product.image}}" alt="Ảnh"
+						class="w-24 h-24 object-cover rounded border" />
+				</div>
+
+				<div>
+					<label class="block mb-1 font-medium text-gray-700">Phần
+						trăm giảm</label> <input type="number" th:field="*{discountPercent}"
+						min="0" max="100"
+						class="w-full border border-gray-300 px-3 py-2 rounded" required />
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label class="block mb-1 font-medium text-gray-700">Từ
+							ngày</label> <input type="date" th:field="*{startDate}"
+							class="w-full border border-gray-300 px-3 py-2 rounded" required />
+					</div>
+					<div>
+						<label class="block mb-1 font-medium text-gray-700">Đến
+							ngày</label> <input type="date" th:field="*{endDate}"
+							class="w-full border border-gray-300 px-3 py-2 rounded" required />
+					</div>
+				</div>
+
+				<div>
+					<label class="block mb-1 font-medium text-gray-700">Trạng
+						thái</label>
+					<div class="flex gap-4">
+						<label class="inline-flex items-center"> <input
+							type="radio" th:field="*{status}" value="1" /> <span
+							class="ml-2">Hoạt động</span>
+						</label> <label class="inline-flex items-center"> <input
+							type="radio" th:field="*{status}" value="0" /> <span
+							class="ml-2">Ẩn</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="pt-4 flex space-x-2">
+					<button type="submit"
+						class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium">
+						Cập nhật</button>
+					<a th:href="@{/admin/hotdeal}"
+						class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded font-medium">
+						Huỷ </a>
+				</div>
+			</form>
+
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</main>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

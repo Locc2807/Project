@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 min-h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto p-6">
+			<main class="flex-1">
+				<!-- Header -->
+				<div class="mb-6">
+					<div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+						<a th:href="@{/admin/product}" class="hover:text-blue-600">Sản phẩm</a>
+						<span>/</span>
+						<span class="text-gray-800">Lịch sử giá</span>
+					</div>
+					<h1 class="text-3xl font-bold text-gray-800">
+						<i class="fa-solid fa-history"></i> Lịch sử thay đổi giá
+					</h1>
+				</div>
+
+				<!-- Product Info -->
+				<div class="bg-white p-4 rounded-xl shadow mb-6">
+					<div class="flex items-center gap-4">
+						<img th:src="@{'/uploads/' + ${product.image}}" 
+							alt="Product" class="h-20 w-20 object-cover rounded">
+						<div>
+							<h2 class="text-xl font-semibold" th:text="${product.name}"></h2>
+							<p class="text-gray-600">
+								Giá hiện tại: 
+								<span class="text-lg font-bold text-green-600" 
+									th:text="${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')} + ' VNĐ'"></span>
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Price History Table -->
+				<div class="bg-white p-6 rounded-xl shadow">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">
+						Lịch sử thay đổi giá
+					</h2>
+
+					<div th:if="${priceHistories.content.isEmpty()}" 
+						class="text-center py-8 text-gray-500">
+						<i class="fa-solid fa-inbox text-4xl mb-2"></i>
+						<p>Chưa có lịch sử thay đổi giá</p>
+					</div>
+
+					<table th:if="${!priceHistories.content.isEmpty()}" 
+						class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">
+									Thời gian
+								</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">
+									Giá cũ
+								</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">
+									Giá mới
+								</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">
+									Thay đổi
+								</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">
+									Người thay đổi
+								</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">
+									Lý do
+								</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200">
+							<tr th:each="history : ${priceHistories.content}">
+								<td class="px-4 py-2 text-sm text-gray-700">
+									<span th:text="${#dates.format(history.changedAt, 'dd/MM/yyyy HH:mm')}"></span>
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-700">
+									<span th:if="${history.oldPrice != null}" 
+										th:text="${#numbers.formatDecimal(history.oldPrice, 1, 'COMMA', 2, 'POINT')}"></span>
+									<span th:if="${history.oldPrice == null}" class="text-gray-400">-</span>
+								</td>
+								<td class="px-4 py-2 text-sm font-semibold text-gray-700">
+									<span th:text="${#numbers.formatDecimal(history.newPrice, 1, 'COMMA', 2, 'POINT')}"></span>
+								</td>
+								<td class="px-4 py-2 text-sm">
+									<span th:if="${history.changePercentage != null}"
+										th:classappend="${history.changePercentage > 0 ? 'text-green-600' : 'text-red-600'}"
+										class="font-semibold">
+										<i th:class="${history.changePercentage > 0 ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"></i>
+										<span th:text="${#numbers.formatDecimal(Math.abs(history.changePercentage), 1, 2)} + '%'"></span>
+									</span>
+									<span th:if="${history.changePercentage == null}" class="text-gray-400">-</span>
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-700">
+									<span th:text="${history.changedBy}"></span>
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-600">
+									<span th:text="${history.changeReason ?: '-'}"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Pagination -->
+					<div th:if="${totalPage > 1}" class="flex justify-end mt-4">
+						<ul class="inline-flex -space-x-px text-sm">
+							<li th:if="${currentPage > 1}">
+								<a th:href="@{'/admin/product/' + ${product.id} + '/price-history?pageNo=' + ${currentPage - 1}}"
+									class="px-3 py-1 rounded-l bg-gray-100 border border-gray-300 hover:bg-gray-200">
+									&laquo;
+								</a>
+							</li>
+							<li th:each="i : ${#numbers.sequence(1, totalPage)}"
+								th:classappend="${currentPage == i ? 'active' : ''}">
+								<a th:href="@{'/admin/product/' + ${product.id} + '/price-history?pageNo=' + ${i}}"
+									th:text="${i}"
+									th:class="${currentPage == i ? 'px-3 py-1 bg-blue-500 text-white border border-blue-500' : 'px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100'}">
+								</a>
+							</li>
+							<li th:if="${currentPage < totalPage}">
+								<a th:href="@{'/admin/product/' + ${product.id} + '/price-history?pageNo=' + ${currentPage + 1}}"
+									class="px-3 py-1 rounded-r bg-gray-100 border border-gray-300 hover:bg-gray-200">
+									&raquo;
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer" class="mt-auto"></div>
+		</div>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+
+</body>
+</html>

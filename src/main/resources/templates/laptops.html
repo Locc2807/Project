@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+<head th:replace="layout/head :: head">
+<meta charset="UTF-8">
+<title>Laptops - TechZone</title>
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+</head>
+
+<body>
+	<header th:replace="layout/header :: header"></header>
+
+	<nav id="navigation">
+		<div class="container">
+			<div id="responsive-nav">
+				<ul class="main-nav nav navbar-nav">
+					<li><a th:href="@{/}">Home</a></li>
+					<li><a th:href="@{/deals}">Hot Deals</a></li>
+					<li><a th:href="@{/categories}">Categories</a></li>
+					<li class="active"><a th:href="@{/laptops}">Laptops</a></li>
+					<li><a th:href="@{/smartphones}">Smartphones</a></li>
+					<li><a th:href="@{/cameras}">Cameras</a></li>
+					<li><a th:href="@{/accessories}">Accessories</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div id="breadcrumb" class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<ul class="breadcrumb-tree">
+						<li><a th:href="@{/}">Home</a></li>
+						<li><a th:href="@{/categories}">All Categories</a></li>
+						<li class="active">Laptops</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section">
+		<div class="container">
+			<div class="row">
+				<!-- ASIDE -->
+				<div id="aside" class="col-md-3">
+					<div class="aside">
+						<h3 class="aside-title">Brands</h3>
+						<div class="checkbox-filter">
+							<div class="input-checkbox">
+								<input type="checkbox" class="laptop-brand-checkbox"
+									id="brand-asus" value="ASUS"> <label for="brand-asus"><span></span>ASUS
+									<small>(1)</small></label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" class="laptop-brand-checkbox"
+									id="brand-dell" value="DELL"> <label for="brand-dell"><span></span>DELL
+									<small>(1)</small></label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" class="laptop-brand-checkbox"
+									id="brand-hp" value="HP"> <label for="brand-hp"><span></span>HP
+									<small>(1)</small></label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" class="laptop-brand-checkbox"
+									id="brand-apple" value="APPLE"> <label
+									for="brand-apple"><span></span>APPLE <small>(1)</small></label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" class="laptop-brand-checkbox"
+									id="brand-lenovo" value="LENOVO"> <label
+									for="brand-lenovo"><span></span>LENOVO <small>(1)</small></label>
+							</div>
+						</div>
+					</div>
+
+					<div class="aside">
+						<h3 class="aside-title">Top selling</h3>
+						<div th:each="product : ${topSelling}" class="product-widget">
+							<div class="product-img">
+								<img th:if="${product.image != null}"
+									th:src="@{'/uploads/' + ${product.image}}" alt=""> 
+								<img th:unless="${product.image != null}" src="/images/default.png" alt="">
+							</div>
+							<div class="product-body">
+								<p class="product-category"
+									th:text="${product.category != null ? product.category.name : 'No category'}">Category</p>
+								<h3 class="product-name">
+									<a href="#" th:text="${product.name}">Product Name</a>
+								</h3>
+								<h4 class="product-price"
+									th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></h4>
+								
+								<!-- Stock Status -->
+								<div th:with="inventory=${inventoryMap[product.id]}">
+									<span th:if="${inventory == null || inventory.quantity == 0}" 
+										class="badge" style="background-color: #dc3545; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">
+										Hết hàng
+									</span>
+									<span th:if="${inventory != null && inventory.quantity > 0 && inventory.quantity <= inventory.minStockLevel}" 
+										class="badge" style="background-color: #ffc107; color: #000; padding: 3px 8px; border-radius: 3px; font-size: 11px;">
+										Còn <span th:text="${inventory.quantity}">0</span> sản phẩm
+									</span>
+									<span th:if="${inventory != null && inventory.quantity > inventory.minStockLevel}" 
+										class="badge" style="background-color: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">
+										Còn hàng
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /ASIDE -->
+
+				<!-- STORE -->
+				<div id="store" class="col-md-9">
+					<div class="store-filter clearfix">
+						<div class="store-sort">
+							<label>Sort By: <select id="sort-select"
+								class="form-control" onchange="updateFilter()">
+									<option value="name" th:selected="${selectedSort == 'name'}">Name</option>
+									<option value="price" th:selected="${selectedSort == 'price'}">Price</option>
+							</select>
+							</label> <label>Show: <select id="show-select"
+								class="input-select" onchange="updateFilter()">
+									<option value="3" th:selected="${selectedShow == 3}">3</option>
+									<option value="6" th:selected="${selectedShow == 6}">6</option>
+							</select>
+							</label>
+						</div>
+					</div>
+
+					<div class="row" id="product-list">
+						<div
+							class="col-12 col-sm-6 col-md-4 mb-4 d-flex align-items-stretch"
+							th:each="product : ${products}">
+							<div class="product h-100 d-flex flex-column"
+								th:attr="data-price=${product.price}, data-name=${product.name}, data-popularity=${product.id}">
+								<div class="product-img">
+									<img th:if="${product.image != null}"
+										th:src="@{'/uploads/' + ${product.image}}" alt="Ảnh sản phẩm"
+										class="img-fluid" style="height: 200px; object-fit: cover;" />
+									<img th:unless="${product.image != null}"
+										src="/images/default.png" class="img-fluid"
+										style="height: 200px; object-fit: cover;" />
+								</div>
+								<div class="product-body d-flex flex-column">
+									<p class="product-category"
+										th:text="${product.category != null ? product.category.name : 'No category'}">Category</p>
+									<h3 class="product-name">
+										<a href="#" th:text="${product.name}"
+											class="d-block text-truncate" style="max-width: 100%">Tên
+											sản phẩm</a>
+									</h3>
+									<h4 class="product-price">
+										<span
+											th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+									</h4>
+									<div class="product-rating">
+										<i class="fa fa-star" th:each="i : ${#numbers.sequence(1,5)}"></i>
+									</div>
+									<div class="product-btns mt-auto">
+										<a th:href="@{/product/quickview/{id}(id=${product.id})}"
+											class="btn btn-sm btn-outline-info"> <i class="fa fa-eye"></i>
+											Quick View
+										</a>
+									</div>
+								</div>
+								<div class="add-to-cart">
+									<button class="add-to-cart-btn" data-id="[[${product.id}]]">
+										<i class="fa fa-shopping-cart"></i> add to cart
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- PAGINATION -->
+					<div class="store-filter clearfix">
+						<span class="store-qty"
+							th:text="'Showing page ' + ${currentPage} + ' of ' + ${totalPages}">Page
+							info</span>
+						<ul class="store-pagination">
+							<li th:if="${currentPage > 1}"><a
+								th:href="@{/laptops(page=${currentPage - 1})}"><i
+									class="fa fa-angle-left"></i></a></li>
+							<li th:each="i : ${#numbers.sequence(1, totalPages)}"
+								th:classappend="${i == currentPage} ? 'active'"><a
+								th:href="@{/laptops(page=${i})}" th:text="${i}">1</a></li>
+							<li th:if="${currentPage < totalPages}"><a
+								th:href="@{/laptops(page=${currentPage + 1})}"><i
+									class="fa fa-angle-right"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<!-- /STORE -->
+			</div>
+		</div>
+	</div>
+
+
+	<footer th:replace="layout/footer :: footer"></footer>
+	<script th:replace="layout/script :: script"></script>
+
+	<script th:inline="javascript">
+/*<![CDATA[*/
+function initAddToCartButtons() {
+  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+      const productId = this.getAttribute('data-id');
+      if (!productId) return;
+
+      fetch('/cart/add/' + productId, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('cart-count').innerText = data.totalItems;
+        })
+        .catch(err => console.error(err));
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initAddToCartButtons);
+/*]]>*/
+</script>
+
+
+</body>
+</html>

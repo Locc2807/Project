@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Header -->
+	<header class="sticky top-0 z-50"
+		th:replace="admin/fragment/header :: header"></header>
+
+	<!-- Layout -->
+	<div class="flex pt-14 min-h-screen">
+		<!-- Sidebar -->
+		<aside th:replace="admin/fragment/aside :: aside"></aside>
+
+		<!-- Main Content -->
+		<main class="flex-1 p-6 overflow-y-auto">
+			<h1 class="text-2xl font-bold mb-4">Quản lý khách hàng</h1>
+
+			<!-- Search -->
+			<div class="flex justify-between items-center mb-4">
+				<form th:action="@{/admin/customer}" method="get"
+					class="flex gap-4 w-full max-w-md">
+					<input type="text" name="keyword" th:value="${keyword}"
+						placeholder="Tìm theo tên, email, SĐT..."
+						class="border p-2 rounded w-48" />
+					<button type="submit"
+						class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center justify-center">
+						<i class="fas fa-search"></i>
+					</button>
+				</form>
+			</div>
+
+			<!-- Table -->
+			<div class="bg-white shadow-md rounded overflow-x-auto">
+				<table class="min-w-full divide-y divide-gray-200 text-sm">
+					<thead class="bg-gray-100">
+						<tr>
+							<th class="px-4 py-2 text-left">ID</th>
+							<th class="px-4 py-2 text-left">Họ tên</th>
+							<th class="px-4 py-2 text-left">Email</th>
+							<th class="px-4 py-2 text-left">SĐT</th>
+							<th class="px-4 py-2 text-left">Ngày sinh</th>
+							<th class="px-4 py-2 text-left">Giới tính</th>
+							<th class="px-4 py-2 text-left">Địa chỉ</th>
+							<th class="px-4 py-2 text-left">Ngày tạo</th>
+							<th class="px-4 py-2 text-left">Tên tài khoản</th>
+							<th class="px-4 py-2 text-center">Hành động</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-gray-200"
+						th:if="${customers != null}">
+						<tr th:each="customer : ${customers}">
+							<td class="px-4 py-2" th:text="${customer.id}">1</td>
+							<td class="px-4 py-2" th:text="${customer.name}">Nguyễn Văn
+								A</td>
+							<td class="px-4 py-2" th:text="${customer.email}">a@gmail.com</td>
+							<td class="px-4 py-2" th:text="${customer.phone}">0901234567</td>
+							<td class="px-4 py-2"
+								th:text="${#dates.format(customer.birthday, 'dd/MM/yyyy')}">01/01/1995</td>
+							<td class="px-4 py-2" th:text="${customer.gender}">Nam</td>
+							<td class="px-4 py-2" th:text="${customer.address}">Hà Nội</td>
+							<td class="px-4 py-2"
+								th:text="${#dates.format(customer.created, 'dd/MM/yyyy')}">03/07/2025</td>
+							<td class="px-4 py-2"
+								th:text="${customer.user != null ? customer.user.username : 'Chưa liên kết'}">user123</td>
+							<td class="px-4 py-2 text-center" x-data="{ open: false }"
+								@click.away="open = false">
+								<button @click="open = !open"
+									class="inline-flex items-center px-3 py-1 text-sm bg-gray-700 text-white rounded hover:bg-gray-800">
+									Hành động
+									<svg class="w-4 h-4 ml-1" fill="currentColor"
+										viewBox="0 0 20 20">
+			<path fill-rule="evenodd"
+											d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.25 8.27a.75.75 0 01-.02-1.06z"
+											clip-rule="evenodd" />
+		</svg>
+								</button>
+								<div x-show="open"
+									class="absolute right-0 mt-2 w-48 bg-white border rounded shadow z-50 text-left"
+									x-transition>
+
+									<!-- Trạng thái tài khoản -->
+									<div class="px-4 py-2 text-sm text-gray-600 border-b">
+										Tài khoản: <span
+											th:if="${customer.user != null and customer.user.enabled}"
+											class="text-green-600 font-semibold"> Đang mở </span> <span
+											th:if="${customer.user != null and not customer.user.enabled}"
+											class="text-red-600 font-semibold"> Đã khoá </span>
+									</div>
+
+									<!-- Các hành động -->
+									<a th:href="@{'/admin/customers/orders/' + ${customer.id}}"
+										class="block px-4 py-2 text-sm hover:bg-gray-100">Lịch sử
+										đơn</a> <a
+										th:href="@{'/admin/customers/reviews/' + ${customer.id}}"
+										class="block px-4 py-2 text-sm hover:bg-gray-100">Xem đánh
+										giá</a> <a th:href="@{'/admin/customers/lock/' + ${customer.id}}"
+										class="block px-4 py-2 text-sm hover:bg-gray-100"
+										th:if="${customer.user != null and customer.user.enabled}">
+										Khoá tài khoản </a> <a
+										th:href="@{'/admin/customers/unlock/' + ${customer.id}}"
+										class="block px-4 py-2 text-sm hover:bg-gray-100"
+										th:if="${customer.user != null and not customer.user.enabled}">
+										Mở khoá tài khoản </a> <a
+										th:href="@{'/admin/customers/delete/' + ${customer.id}}"
+										onclick="return confirm('Xác nhận xoá khách hàng này?')"
+										class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Xoá</a>
+								</div>
+
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- Phân trang -->
+				<div class="flex justify-center mt-4" th:if="${totalPages > 1}">
+					<ul class="inline-flex -space-x-px">
+						<li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"><a
+							th:href="@{/admin/customer(page=${i}, keyword=${keyword})}"
+							th:classappend="${i == currentPage} ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+							class="px-3 py-1 border hover:bg-gray-200"> <span
+								th:text="${i + 1}">1</span>
+						</a></li>
+					</ul>
+				</div>
+
+			</div>
+
+			<div th:replace="admin/fragment/footer :: footer" class="mt-6"></div>
+		</main>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+	<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+</body>
+</html>

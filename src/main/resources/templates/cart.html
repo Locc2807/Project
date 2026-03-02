@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/head :: head"></head>
+<body>
+
+	<!-- Header -->
+	<div th:replace="layout/header :: header"></div>
+
+	<!-- Cart Content -->
+	<div class="container mx-auto px-4 py-8">
+		<h1 class="text-3xl font-bold mb-6">
+			<i class="fa-solid fa-shopping-cart"></i> Giỏ hàng của bạn
+		</h1>
+
+		<!-- Empty Cart -->
+		<div th:if="${cart.isEmpty()}" class="text-center py-16">
+			<i class="fa-solid fa-shopping-cart text-gray-300 text-6xl mb-4"></i>
+			<h2 class="text-2xl font-semibold text-gray-600 mb-2">Giỏ hàng trống</h2>
+			<p class="text-gray-500 mb-6">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+			<a th:href="@{/}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+				<i class="fa-solid fa-arrow-left mr-2"></i> Tiếp tục mua sắm
+			</a>
+		</div>
+
+		<!-- Cart Items -->
+		<div th:if="${!cart.isEmpty()}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+			<!-- Cart Items List -->
+			<div class="lg:col-span-2">
+				<div class="bg-white rounded-lg shadow">
+					<div class="p-4 border-b">
+						<h2 class="text-xl font-semibold">
+							Sản phẩm (<span th:text="${totalItems}"></span>)
+						</h2>
+					</div>
+
+					<!-- Cart Item -->
+					<div th:each="item : ${cartItems}" class="p-4 border-b hover:bg-gray-50">
+						<div class="flex gap-4">
+							<!-- Product Image -->
+							<div class="flex-shrink-0">
+								<img th:src="@{'/uploads/' + ${item.image}}" 
+									th:alt="${item.name}"
+									class="w-24 h-24 object-cover rounded">
+							</div>
+
+							<!-- Product Info -->
+							<div class="flex-1">
+								<h3 class="font-semibold text-lg mb-2" th:text="${item.name}"></h3>
+								<p class="text-red-600 font-bold text-lg mb-2">
+									<span th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+								</p>
+
+								<!-- Quantity Controls -->
+								<div class="flex items-center gap-2">
+									<button onclick="updateQuantity(this, -1)" 
+										th:data-id="${item.id}"
+										class="w-8 h-8 border rounded hover:bg-gray-100">
+										<i class="fa-solid fa-minus text-sm"></i>
+									</button>
+									<input type="number" 
+										th:value="${item.quantity}"
+										th:data-id="${item.id}"
+										class="quantity-input w-16 text-center border rounded px-2 py-1"
+										min="1"
+										onchange="updateQuantityDirect(this)">
+									<button onclick="updateQuantity(this, 1)" 
+										th:data-id="${item.id}"
+										class="w-8 h-8 border rounded hover:bg-gray-100">
+										<i class="fa-solid fa-plus text-sm"></i>
+									</button>
+									<button onclick="removeItem(this)" 
+										th:data-id="${item.id}"
+										class="ml-4 text-red-600 hover:text-red-800">
+										<i class="fa-solid fa-trash"></i> Xóa
+									</button>
+								</div>
+							</div>
+
+							<!-- Item Total -->
+							<div class="text-right">
+								<p class="font-bold text-lg">
+									<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Clear Cart -->
+					<div class="p-4">
+						<button onclick="clearCart()" 
+							class="text-red-600 hover:text-red-800">
+							<i class="fa-solid fa-trash-alt"></i> Xóa toàn bộ giỏ hàng
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Order Summary -->
+			<div class="lg:col-span-1">
+				<div class="bg-white rounded-lg shadow p-6 sticky top-4">
+					<h2 class="text-xl font-semibold mb-4">Tổng đơn hàng</h2>
+
+					<div class="space-y-3 mb-4">
+						<div class="flex justify-between">
+							<span class="text-gray-600">Tạm tính:</span>
+							<span class="font-semibold" id="subtotal">
+								<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+							</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-gray-600">Phí vận chuyển:</span>
+							<span class="font-semibold">Miễn phí</span>
+						</div>
+						<div class="border-t pt-3 flex justify-between text-lg">
+							<span class="font-bold">Tổng cộng:</span>
+							<span class="font-bold text-red-600" id="total">
+								<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+							</span>
+						</div>
+					</div>
+
+					<a th:href="@{/checkout}" 
+						class="block w-full bg-red-600 text-white text-center py-3 rounded-lg hover:bg-red-700 font-semibold mb-3">
+						<i class="fa-solid fa-credit-card mr-2"></i> Thanh toán
+					</a>
+
+					<a th:href="@{/}" 
+						class="block w-full bg-gray-200 text-gray-800 text-center py-3 rounded-lg hover:bg-gray-300">
+						<i class="fa-solid fa-arrow-left mr-2"></i> Tiếp tục mua sắm
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="layout/footer :: footer"></div>
+
+	<!-- Scripts -->
+	<div th:replace="layout/script :: script"></div>
+
+	<script>
+		// Cập nhật số lượng (tăng/giảm)
+		function updateQuantity(button, change) {
+			const productId = button.getAttribute('data-id');
+			const input = document.querySelector(`input[data-id="${productId}"]`);
+			let quantity = parseInt(input.value) + change;
+			
+			if (quantity < 1) quantity = 1;
+			
+			input.value = quantity;
+			updateCart(productId, quantity);
+		}
+
+		// Cập nhật số lượng trực tiếp
+		function updateQuantityDirect(input) {
+			const productId = input.getAttribute('data-id');
+			let quantity = parseInt(input.value);
+			
+			if (quantity < 1) {
+				quantity = 1;
+				input.value = 1;
+			}
+			
+			updateCart(productId, quantity);
+		}
+
+		// Gọi API cập nhật giỏ hàng
+		function updateCart(productId, quantity) {
+			fetch(`/cart/update/${productId}?quantity=${quantity}`, {
+				method: 'POST'
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					location.reload(); // Reload để cập nhật tổng tiền
+				}
+			})
+			.catch(error => console.error('Error:', error));
+		}
+
+		// Xóa sản phẩm
+		function removeItem(button) {
+			if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+			
+			const productId = button.getAttribute('data-id');
+			
+			fetch(`/cart/remove/${productId}`, {
+				method: 'POST'
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					location.reload();
+				}
+			})
+			.catch(error => console.error('Error:', error));
+		}
+
+		// Xóa toàn bộ giỏ hàng
+		function clearCart() {
+			if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) return;
+			
+			fetch('/cart/clear', {
+				method: 'POST'
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					location.reload();
+				}
+			})
+			.catch(error => console.error('Error:', error));
+		}
+	</script>
+
+</body>
+</html>

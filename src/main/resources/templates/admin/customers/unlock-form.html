@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Header -->
+	<header class="sticky top-0 z-50"
+		th:replace="admin/fragment/header :: header"></header>
+
+	<!-- Layout -->
+	<div class="flex pt-14 min-h-screen">
+		<!-- Sidebar -->
+		<aside th:replace="admin/fragment/aside :: aside"></aside>
+
+		<!-- Main Content -->
+		<main class="flex-1 p-6 overflow-y-auto">
+			<div class="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6">
+				<h2 class="text-xl font-semibold mb-4 text-gray-800">Mở khoá
+					tài khoản</h2>
+
+				<form th:action="@{/admin/customers/unlock}" method="post"
+					class="space-y-4">
+					<input type="hidden" name="customerId" th:value="${customer.id}" />
+
+					<p class="text-gray-700">
+						Bạn có chắc muốn mở khoá tài khoản <span
+							class="font-semibold text-blue-600" th:text="${customer.name}">Tên</span>?
+					</p>
+
+					<div class="flex justify-end gap-4 mt-6">
+						<a href="/admin/customer"
+							class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded">
+							Huỷ </a>
+						<button type="submit"
+							class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded">
+							Xác nhận mở khoá</button>
+					</div>
+				</form>
+			</div>
+
+			<div></div>
+			<div th:replace="admin/fragment/footer :: footer" class="mt-6"></div>
+		</main>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+	<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+</body>
+</html>

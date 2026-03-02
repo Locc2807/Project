@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+
+<head th:replace="layout/head :: head">
+<meta charset="UTF-8">
+<title>Thông tin và Sổ địa chỉ</title>
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+	rel="stylesheet">
+</head>
+
+<body>
+	<header th:replace="layout/header :: header"></header>
+
+	<!-- NAVIGATION -->
+	<nav id="navigation">
+		<div class="container">
+			<div id="responsive-nav">
+				<ul class="main-nav nav navbar-nav">
+					<li><a th:href="@{/}">Home</a></li>
+					<li><a th:href="@{/deals}">Hot Deals</a></li>
+					<li><a th:href="@{/categories}">Categories</a></li>
+					<li><a th:href="@{/laptops}">Laptops</a></li>
+					<li><a th:href="@{/smartphones}">Smartphones</a></li>
+					<li><a th:href="@{/cameras}">Cameras</a></li>
+					<li><a th:href="@{/accessories}">Accessories</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- NAVIGATION -->
+
+	<div class="container-fluid" style="margin-top: 30px;">
+		<div class="row">
+			<!-- Menu trái -->
+			<div class="col-sm-3">
+				<h4>
+					<b sec:authentication="name"></b>
+				</h4>
+				<ul class="nav nav-pills nav-stacked" style="margin-top: 20px;">
+					<li th:classappend="${currentPage == 'orders'} ? 'active'"><a
+						th:href="@{/user/orders}"><i class="fa fa-list"></i> Đơn hàng
+							đã mua</a></li>
+					<li th:classappend="${currentPage == 'profile'} ? 'active'"><a
+						th:href="@{/user/orders}"><i class="fa fa-user"></i> Thông tin
+							và sổ địa chỉ</a></li>
+				</ul>
+				<a th:href="@{/user/logout}" class="btn btn-danger btn-block"
+					style="margin-top: 20px;">Đăng xuất</a>
+			</div>
+
+			<!-- Nội dung chính -->
+			<div class="col-sm-9">
+				<h3>Thông tin cá nhân</h3>
+				<p>
+					<span th:text="${user.name}">Tên người dùng</span> - <span
+						th:text="${user.customer.phone}">Số điện thoại</span> <a href="#"
+						id="edit-toggle" style="margin-left: 10px;"> <i
+						class="fa fa-edit"></i> Sửa
+					</a>
+				</p>
+
+				<form class="form-horizontal" id="profile-form"
+					style="display: none;">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Giới tính:</label>
+						<div class="col-sm-10">
+							<label class="radio-inline"> <input type="radio"
+								name="gender" value="Nam"
+								th:checked="${user.customer.gender == 'Nam'}"> Anh
+							</label> <label class="radio-inline"> <input type="radio"
+								name="gender" value="Nữ"
+								th:checked="${user.customer.gender == 'Nữ'}"> Chị
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Họ & Tên:</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="txtFullName"
+								th:value="${user.name}">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Số điện thoại:</label>
+						<div class="col-sm-10">
+							<input type="tel" class="form-control" name="txtPhoneNumber"
+								th:value="${user.customer.phone}" disabled>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="button" class="btn btn-default" id="cancel-edit">Huỷ</button>
+							<button type="submit" class="btn btn-primary"
+								onclick="ProfileEdit(this)">Lưu</button>
+						</div>
+					</div>
+				</form>
+
+				<hr>
+
+				<h3>Địa chỉ nhận hàng</h3>
+				<form class="form-horizontal" onsubmit="return false;">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Tỉnh/Thành:</label>
+						<div class="col-sm-10">
+							<select class="form-control" name="hdProvinceId">
+								<option value="0">Chọn tỉnh/thành</option>
+								<option value="5">Hà Nội</option>
+								<option value="3">Hồ Chí Minh</option>
+								<option value="9">Đà Nẵng</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Quận/Huyện:</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="hdDistrictId">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Phường/Xã:</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="hdWardId">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Số nhà, tên đường:</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="txtAddress"
+								placeholder="Số nhà, tên đường*"
+								th:value="${user.customer.address}">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<label class="checkbox-inline"> <input type="checkbox"
+								name="hdIsDefault"> Đặt làm địa chỉ mặc định
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-primary"
+								onclick="AddressSubmit(this)">Cập nhật</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<footer th:replace="layout/footer :: footer"></footer>
+	<script th:replace="layout/script :: script"></script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const toggleBtn = document.getElementById("edit-toggle");
+			const form = document.getElementById("profile-form");
+
+			toggleBtn.addEventListener("click", function(e) {
+				e.preventDefault();
+				form.style.display = form.style.display === "none" ? "block"
+						: "none";
+			});
+		});
+	</script>
+</body>
+</html>

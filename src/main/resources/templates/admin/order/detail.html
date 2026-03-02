@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head">
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+	<!-- Header -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Wrapper chứa sidebar + main, tránh bị header che -->
+	<div class="pt-14">
+		<div class="flex">
+			<!-- Sidebar -->
+			<div th:replace="admin/fragment/aside :: aside"></div>
+
+			<!-- Main content -->
+			<main class="flex-1 p-6">
+				<div class="bg-white rounded-xl shadow-md p-6">
+					<h1 class="text-2xl font-bold mb-4">Chi tiết đơn hàng</h1>
+
+					<!-- Thông tin đơn hàng -->
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+						<div>
+							<p>
+								<span class="font-medium">Mã đơn hàng:</span> <span
+									th:text="${wrapper.order.id}"></span>
+							</p>
+							<p>
+								<span class="font-medium">Trạng thái:</span> <span
+									th:switch="${wrapper.order.status}"> <span th:case="1"
+									class="text-yellow-600 font-medium">Chờ xác nhận</span> <span
+									th:case="2" class="text-blue-600 font-medium">Đã xác
+										nhận</span> <span th:case="3" class="text-indigo-600 font-medium">Đang
+										chuyển</span> <span th:case="4" class="text-purple-600 font-medium">Đang
+										giao</span> <span th:case="5" class="text-gray-500 font-medium">Đã
+										hủy</span> <span th:case="6" class="text-green-600 font-medium">Thành
+										công</span> <span th:case="7" class="text-red-600 font-medium">Yêu
+										cầu hủy</span> <span th:case="*">Không rõ</span>
+								</span>
+							</p>
+						</div>
+						<div>
+							<p>
+								<span class="font-medium">Khách hàng:</span> <span
+									th:text="${wrapper.order.customer.name}"></span>
+							</p>
+							<p>
+								<span class="font-medium">Số điện thoại:</span> <span
+									th:text="${wrapper.order.customer.phone}"></span>
+							</p>
+							<p>
+								<span class="font-medium">Địa chỉ:</span> <span
+									th:text="${wrapper.order.customer.address}"></span>
+							</p>
+							<p>
+								<span class="font-medium">Ngày đặt:</span> <span
+									th:text="${wrapper.formattedCreatedDate}"></span>
+							</p>
+						</div>
+					</div>
+
+					<!-- Bảng sản phẩm -->
+					<h2 class="text-lg font-semibold mb-2">Sản phẩm trong đơn</h2>
+					<div class="overflow-x-auto">
+						<table
+							class="w-full border border-gray-200 text-sm rounded-lg overflow-hidden">
+							<thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+								<tr>
+									<th class="px-4 py-2 border">Tên sản phẩm</th>
+									<th class="px-4 py-2 border">Số lượng</th>
+									<th class="px-4 py-2 border">Giá</th>
+									<th class="px-4 py-2 border">Thành tiền</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${wrapper.order.orderDetails}"
+									class="hover:bg-gray-50">
+									<td class="border px-4 py-2" th:text="${item.product.name}"></td>
+									<td class="border px-4 py-2 text-center"
+										th:text="${item.quantity}"></td>
+									<td
+										class="border px-4 py-2 text-right text-red-600 font-medium"
+										th:text="${wrapper.formatCurrency(item.price)}"></td>
+									<td class="border px-4 py-2 text-right font-semibold"
+										th:text="${wrapper.formatCurrency(item.price * item.quantity)}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- Tổng tiền -->
+					<div class="mt-4 text-right">
+						<p class="text-xl font-bold text-red-600">
+							Tổng cộng: <span th:text="${wrapper.formattedTotalPrice}"></span>
+						</p>
+					</div>
+					
+					<!-- Actions -->
+					<div class="mt-6 flex gap-3 flex-wrap">
+						<!-- Nút xác nhận (chỉ hiện khi status = 1) -->
+						<form th:if="${wrapper.order.status == 1}" 
+						      th:action="@{/admin/order/confirm/{id}(id=${wrapper.order.id})}" 
+						      method="post" class="inline">
+							<button type="submit" 
+							        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+								Xác nhận đơn hàng
+							</button>
+						</form>
+						
+						<!-- Nút hủy (chỉ hiện khi status = 1 hoặc 7) -->
+						<form th:if="${wrapper.order.status == 1 or wrapper.order.status == 7}" 
+						      th:action="@{/admin/order/cancel/{id}(id=${wrapper.order.id})}" 
+						      method="post" class="inline"
+						      onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">
+							<button type="submit" 
+							        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+								Hủy đơn hàng
+							</button>
+						</form>
+						
+						<!-- Nút chuyển sang đang chuyển (status = 2) -->
+						<form th:if="${wrapper.order.status == 2}" 
+						      th:action="@{/admin/order/updateStatus/{id}/{status}(id=${wrapper.order.id},status=3)}" 
+						      method="post" class="inline">
+							<button type="submit" 
+							        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+								Chuyển sang "Đang chuyển"
+							</button>
+						</form>
+						
+						<!-- Nút chuyển sang đang giao (status = 3) -->
+						<form th:if="${wrapper.order.status == 3}" 
+						      th:action="@{/admin/order/updateStatus/{id}/{status}(id=${wrapper.order.id},status=4)}" 
+						      method="post" class="inline">
+							<button type="submit" 
+							        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
+								Chuyển sang "Đang giao"
+							</button>
+						</form>
+						
+						<!-- Nút hoàn thành (status = 4) -->
+						<form th:if="${wrapper.order.status == 4}" 
+						      th:action="@{/admin/order/updateStatus/{id}/{status}(id=${wrapper.order.id},status=6)}" 
+						      method="post" class="inline">
+							<button type="submit" 
+							        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+								Đánh dấu "Thành công"
+							</button>
+						</form>
+						
+						<!-- Nút download hóa đơn -->
+						<a th:href="@{/admin/order/{id}/invoice(id=${wrapper.order.id})}" 
+						   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg inline-block">
+							📄 Tải hóa đơn
+						</a>
+						
+						<!-- Nút download phiếu giao hàng -->
+						<a th:href="@{/admin/order/{id}/delivery-note(id=${wrapper.order.id})}" 
+						   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg inline-block">
+							📦 Tải phiếu giao hàng
+						</a>
+						
+						<!-- Nút quay lại -->
+						<a th:href="@{/admin/order}" 
+						   class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg inline-block">
+							← Quay lại
+						</a>
+					</div>
+				</div>
+				
+				<!-- Grid 2 cột: Lịch sử và Ghi chú -->
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+					
+					<!-- Cột trái: Lịch sử thay đổi trạng thái -->
+					<div class="bg-white rounded-xl shadow-md p-6">
+						<h2 class="text-xl font-bold mb-4 flex items-center">
+							<span class="mr-2">📜</span> Lịch sử thay đổi trạng thái
+						</h2>
+						
+						<div th:if="${statusHistory.isEmpty()}" class="text-gray-500 text-center py-8">
+							Chưa có lịch sử thay đổi
+						</div>
+						
+						<div th:if="${!statusHistory.isEmpty()}" class="space-y-4">
+							<div th:each="history : ${statusHistory}" 
+							     class="border-l-4 border-blue-500 pl-4 py-2 bg-gray-50 rounded">
+								<div class="flex justify-between items-start mb-1">
+									<div>
+										<span class="font-medium text-gray-700">
+											<span th:switch="${history.oldStatus}">
+												<span th:case="1">Chờ xác nhận</span>
+												<span th:case="2">Đã xác nhận</span>
+												<span th:case="3">Đang chuyển</span>
+												<span th:case="4">Đang giao</span>
+												<span th:case="5">Đã hủy</span>
+												<span th:case="6">Thành công</span>
+												<span th:case="7">Yêu cầu hủy</span>
+												<span th:case="*">-</span>
+											</span>
+										</span>
+										<span class="mx-2">→</span>
+										<span class="font-bold" th:switch="${history.newStatus}">
+											<span th:case="1" class="text-yellow-600">Chờ xác nhận</span>
+											<span th:case="2" class="text-blue-600">Đã xác nhận</span>
+											<span th:case="3" class="text-indigo-600">Đang chuyển</span>
+											<span th:case="4" class="text-purple-600">Đang giao</span>
+											<span th:case="5" class="text-gray-600">Đã hủy</span>
+											<span th:case="6" class="text-green-600">Thành công</span>
+											<span th:case="7" class="text-red-600">Yêu cầu hủy</span>
+										</span>
+									</div>
+								</div>
+								<div class="text-sm text-gray-600">
+									<span class="font-medium" th:text="${history.changedBy}"></span>
+									<span class="mx-1">•</span>
+									<span th:text="${#temporals.format(history.changedAt, 'dd/MM/yyyy HH:mm')}"></span>
+								</div>
+								<div th:if="${history.note != null}" class="text-sm text-gray-500 mt-1 italic">
+									<span th:text="${history.note}"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Cột phải: Ghi chú -->
+					<div class="bg-white rounded-xl shadow-md p-6">
+						<h2 class="text-xl font-bold mb-4 flex items-center">
+							<span class="mr-2">📝</span> Ghi chú
+						</h2>
+						
+						<!-- Form thêm ghi chú -->
+						<form th:action="@{/admin/order/{id}/add-note(id=${wrapper.order.id})}" 
+						      method="post" class="mb-4">
+							<textarea name="content" 
+							          rows="3" 
+							          placeholder="Nhập ghi chú..."
+							          required
+							          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+							<div class="flex justify-between items-center mt-2">
+								<label class="flex items-center text-sm text-gray-600">
+									<input type="checkbox" name="isInternal" value="true" checked class="mr-2">
+									Ghi chú nội bộ (chỉ admin thấy)
+								</label>
+								<button type="submit" 
+								        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+									Thêm ghi chú
+								</button>
+							</div>
+						</form>
+						
+						<!-- Danh sách ghi chú -->
+						<div th:if="${notes.isEmpty()}" class="text-gray-500 text-center py-8">
+							Chưa có ghi chú nào
+						</div>
+						
+						<div th:if="${!notes.isEmpty()}" class="space-y-3 max-h-96 overflow-y-auto">
+							<div th:each="note : ${notes}" 
+							     class="border rounded-lg p-3 bg-gray-50"
+							     th:classappend="${note.isInternal} ? 'border-yellow-300 bg-yellow-50' : 'border-gray-200'">
+								<div class="flex justify-between items-start mb-2">
+									<span class="font-medium text-gray-700" th:text="${note.createdBy}"></span>
+									<div class="flex items-center gap-2">
+										<span th:if="${note.isInternal}" 
+										      class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded">
+											Nội bộ
+										</span>
+										<span class="text-xs text-gray-500" 
+										      th:text="${#temporals.format(note.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+									</div>
+								</div>
+								<p class="text-gray-700 text-sm whitespace-pre-wrap" th:text="${note.content}"></p>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</main>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="admin/fragment/footer :: footer"></div>
+	<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

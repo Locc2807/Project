@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/head :: head"></head>
+<body>
+
+	<!-- Header -->
+	<div th:replace="layout/header :: header"></div>
+
+	<!-- Checkout Content -->
+	<div class="container mx-auto px-4 py-8">
+		<h1 class="text-3xl font-bold mb-6">
+			<i class="fa-solid fa-credit-card"></i> Thanh toán
+		</h1>
+
+		<form th:action="@{/checkout/place-order}" method="post">
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+				<!-- Left: Customer Info -->
+				<div class="lg:col-span-2 space-y-6">
+					<!-- Thông tin người nhận -->
+					<div class="bg-white rounded-lg shadow p-6">
+						<h2 class="text-xl font-semibold mb-4">
+							<i class="fa-solid fa-user"></i> Thông tin người nhận
+						</h2>
+
+						<div class="space-y-4">
+							<div>
+								<label class="block text-sm font-medium mb-1">
+									Họ và tên <span class="text-red-500">*</span>
+								</label>
+								<input type="text" name="receiverName" required
+									th:value="${customer != null ? customer.name : ''}"
+									class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									placeholder="Nhập họ và tên">
+							</div>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div>
+									<label class="block text-sm font-medium mb-1">
+										Số điện thoại <span class="text-red-500">*</span>
+									</label>
+									<input type="tel" name="receiverPhone" required
+										th:value="${customer != null ? customer.phone : ''}"
+										class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										placeholder="Nhập số điện thoại">
+								</div>
+
+								<div>
+									<label class="block text-sm font-medium mb-1">
+										Email <span class="text-red-500">*</span>
+									</label>
+									<input type="email" name="receiverEmail" required
+										th:value="${customer != null ? customer.email : ''}"
+										class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										placeholder="Nhập email">
+								</div>
+							</div>
+
+							<div>
+								<label class="block text-sm font-medium mb-1">
+									Địa chỉ giao hàng <span class="text-red-500">*</span>
+								</label>
+								<textarea name="shippingAddress" required rows="3"
+									th:text="${customer != null ? customer.address : ''}"
+									class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									placeholder="Nhập địa chỉ giao hàng đầy đủ"></textarea>
+							</div>
+
+							<div>
+								<label class="block text-sm font-medium mb-1">
+									Ghi chú đơn hàng (tùy chọn)
+								</label>
+								<textarea name="orderNote" rows="2"
+									class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn"></textarea>
+							</div>
+						</div>
+					</div>
+
+					<!-- Phương thức thanh toán -->
+					<div class="bg-white rounded-lg shadow p-6">
+						<h2 class="text-xl font-semibold mb-4">
+							<i class="fa-solid fa-wallet"></i> Phương thức thanh toán
+						</h2>
+
+						<div class="space-y-3">
+							<label class="flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50">
+								<input type="radio" name="paymentMethod" value="COD" checked
+									class="mr-3">
+								<div>
+									<div class="font-semibold">Thanh toán khi nhận hàng (COD)</div>
+									<div class="text-sm text-gray-600">Thanh toán bằng tiền mặt khi nhận hàng</div>
+								</div>
+							</label>
+
+							<label class="flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50">
+								<input type="radio" name="paymentMethod" value="BANK_TRANSFER"
+									class="mr-3">
+								<div>
+									<div class="font-semibold">Chuyển khoản ngân hàng</div>
+									<div class="text-sm text-gray-600">Chuyển khoản trước khi giao hàng</div>
+								</div>
+							</label>
+
+							<label class="flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50 opacity-50">
+								<input type="radio" name="paymentMethod" value="CREDIT_CARD" disabled
+									class="mr-3">
+								<div>
+									<div class="font-semibold">Thẻ tín dụng/Ghi nợ</div>
+									<div class="text-sm text-gray-600">Sắp ra mắt</div>
+								</div>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<!-- Right: Order Summary -->
+				<div class="lg:col-span-1">
+					<div class="bg-white rounded-lg shadow p-6 sticky top-4">
+						<h2 class="text-xl font-semibold mb-4">Đơn hàng của bạn</h2>
+
+						<!-- Products -->
+						<div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
+							<div th:each="item : ${cartItems}" class="flex gap-3 pb-3 border-b">
+								<img th:src="@{'/uploads/' + ${item.image}}" 
+									th:alt="${item.name}"
+									class="w-16 h-16 object-cover rounded">
+								<div class="flex-1">
+									<h3 class="text-sm font-medium" th:text="${item.name}"></h3>
+									<p class="text-sm text-gray-600">
+										<span th:text="${item.quantity}"></span> x 
+										<span th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+									</p>
+								</div>
+								<div class="text-right">
+									<p class="font-semibold">
+										<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Summary -->
+						<div class="space-y-3 mb-4">
+							<div class="flex justify-between">
+								<span class="text-gray-600">Tạm tính:</span>
+								<span class="font-semibold">
+									<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+								</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-gray-600">Phí vận chuyển:</span>
+								<span class="font-semibold text-green-600">Miễn phí</span>
+							</div>
+							<div class="border-t pt-3 flex justify-between text-lg">
+								<span class="font-bold">Tổng cộng:</span>
+								<span class="font-bold text-red-600">
+									<span th:text="${#numbers.formatDecimal(finalTotal, 1, 'COMMA', 2, 'POINT')}"></span> VNĐ
+								</span>
+							</div>
+						</div>
+
+						<!-- Submit Button -->
+						<button type="submit"
+							class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-semibold mb-3">
+							<i class="fa-solid fa-check mr-2"></i> Đặt hàng
+						</button>
+
+						<a th:href="@{/cart}" 
+							class="block w-full bg-gray-200 text-gray-800 text-center py-3 rounded-lg hover:bg-gray-300">
+							<i class="fa-solid fa-arrow-left mr-2"></i> Quay lại giỏ hàng
+						</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="layout/footer :: footer"></div>
+
+	<!-- Scripts -->
+	<div th:replace="layout/script :: script"></div>
+
+</body>
+</html>

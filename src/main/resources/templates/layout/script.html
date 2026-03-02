@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<body>
+	<!-- Header -->
+	<div th:replace="layout/header :: header"></div>
+
+	<!-- Nội dung động -->
+	<div layout:fragment="content"></div>
+
+	<!-- Footer -->
+	<div th:replace="layout/footer :: footer"></div>
+
+	<!-- Scripts -->
+	<script th:src="@{/fe/js/jquery.min.js}"></script>
+	<script th:src="@{/fe/js/bootstrap.min.js}"></script>
+	<script th:src="@{/fe/js/slick.min.js}"></script>
+	<script th:src="@{/fe/js/nouislider.min.js}"></script>
+	<script th:src="@{/fe/js/jquery.zoom.min.js}"></script>
+	<script th:src="@{/fe/js/main.js}"></script>
+
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const password = document.getElementById("password");
+			const confirmPassword = document.getElementById("confirmPassword");
+			const passwordHelp = document.getElementById("passwordHelp");
+
+			if (password && confirmPassword && passwordHelp) {
+				function validatePassword() {
+					if (confirmPassword.value === "") {
+						confirmPassword.classList.remove("is-valid",
+								"is-invalid");
+						passwordHelp.textContent = "";
+					} else if (password.value === confirmPassword.value) {
+						confirmPassword.classList.add("is-valid");
+						confirmPassword.classList.remove("is-invalid");
+						passwordHelp.textContent = "Mật khẩu khớp ✔";
+						passwordHelp.className = "form-text text-success mt-1";
+					} else {
+						confirmPassword.classList.add("is-invalid");
+						confirmPassword.classList.remove("is-valid");
+						passwordHelp.textContent = "Mật khẩu không khớp ✖";
+						passwordHelp.className = "form-text text-danger mt-1";
+					}
+				}
+
+				password.addEventListener("input", validatePassword);
+				confirmPassword.addEventListener("input", validatePassword);
+			}
+		});
+	</script>
+
+	<!-- SCRIPT -->
+	<script>
+document.addEventListener("DOMContentLoaded", function () {
+	const countdownDate = new Date();
+	countdownDate.setDate(countdownDate.getDate() + 2);
+
+	function updateCountdownAll() {
+		const now = new Date().getTime();
+		const distance = countdownDate.getTime() - now;
+
+		const days = Math.max(Math.floor(distance / (1000 * 60 * 60 * 24)), 0);
+		const hours = Math.max(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)), 0);
+		const minutes = Math.max(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)), 0);
+		const seconds = Math.max(Math.floor((distance % (1000 * 60)) / 1000), 0);
+
+		document.querySelectorAll(".cd-days").forEach(el => el.textContent = String(days).padStart(2, '0'));
+		document.querySelectorAll(".cd-hours").forEach(el => el.textContent = String(hours).padStart(2, '0'));
+		document.querySelectorAll(".cd-minutes").forEach(el => el.textContent = String(minutes).padStart(2, '0'));
+		document.querySelectorAll(".cd-seconds").forEach(el => el.textContent = String(seconds).padStart(2, '0'));
+	}
+
+	setInterval(updateCountdownAll, 1000);
+	updateCountdownAll();
+});
+</script>
+
+	<!-- Laptop filter -->
+	<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function () {
+    if (!window.location.pathname.startsWith('/laptops')) return;
+
+    const checkboxes = document.querySelectorAll('.laptop-brand-checkbox');
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            const selected = Array.from(checkboxes)
+                .filter(box => box.checked)
+                .map(box => box.value);
+
+            fetch('/laptops/filter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(selected)
+            })
+            .then(res => res.text())
+            .then(html => {
+                document.querySelector('#product-list').innerHTML = html;
+            });
+        });
+    });
+});
+</script>
+
+	<!-- Smartphone filter -->
+	<script th:inline="javascript">
+	document.addEventListener('DOMContentLoaded', function () {
+		console.log("Smartphone filter script loaded");
+
+		const checkboxes = document.querySelectorAll('.smartphone-brand-checkbox');
+		const productList = document.querySelector('#product-list');
+
+		if (checkboxes.length === 0 || !productList) {
+			console.log("Không tìm thấy checkbox hoặc product list");
+			return;
+		}
+
+		checkboxes.forEach(cb => {
+			cb.addEventListener('change', () => {
+				const selected = Array.from(checkboxes)
+					.filter(box => box.checked)
+					.map(box => box.value);
+
+				console.log("Brands được chọn: ", selected);
+
+				fetch('/smartphones/filter', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(selected)
+				})
+				.then(res => res.text())
+				.then(html => {
+					console.log(html);
+					productList.innerHTML = html;
+				})
+				.catch(err => console.error("Lỗi fetch:", err));
+			});
+		});
+	});
+</script>
+
+	<!-- Camera filter -->
+	<script th:inline="javascript">
+	document.addEventListener('DOMContentLoaded', function () {
+		console.log("Camera filter script loaded");
+
+		const checkboxes = document.querySelectorAll('.camera-brand-checkbox');
+		const productList = document.querySelector('#product-list');
+
+		if (checkboxes.length === 0 || !productList) {
+			console.log("Không tìm thấy checkbox hoặc product list");
+			return;
+		}
+
+		checkboxes.forEach(cb => {
+			cb.addEventListener('change', () => {
+				const selected = Array.from(checkboxes)
+					.filter(box => box.checked)
+					.map(box => box.value);
+
+				console.log("Brands được chọn: ", selected);
+
+				fetch('/cameras/filter', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(selected)
+				})
+				.then(res => res.text())
+				.then(html => {
+					console.log(html);
+					productList.innerHTML = html;
+				})
+				.catch(err => console.error("Lỗi fetch:", err));
+			});
+		});
+	});
+</script>
+
+	<!-- Accessory filter -->
+	<script th:inline="javascript">
+	document.addEventListener('DOMContentLoaded', function () {
+		console.log("Camera filter script loaded");
+
+		const checkboxes = document.querySelectorAll('.accessory-brand-checkbox');
+		const productList = document.querySelector('#product-list');
+
+		if (checkboxes.length === 0 || !productList) {
+			console.log("Không tìm thấy checkbox hoặc product list");
+			return;
+		}
+
+		checkboxes.forEach(cb => {
+			cb.addEventListener('change', () => {
+				const selected = Array.from(checkboxes)
+					.filter(box => box.checked)
+					.map(box => box.value);
+
+				console.log("Brands được chọn: ", selected);
+
+				fetch('/accessories/filter', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(selected)
+				})
+				.then(res => res.text())
+				.then(html => {
+					console.log(html);
+					productList.innerHTML = html;
+				})
+				.catch(err => console.error("Lỗi fetch:", err));
+			});
+		});
+	});
+</script>
+
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		  document.querySelectorAll(".quick-view").forEach(button => {
+		    button.addEventListener("click", function () {
+		      const id = this.getAttribute("data-id");
+		      console.log("Nhấn quickview sản phẩm id:", id);
+
+		      fetch(`/api/admin/product/${id}`, { credentials: 'include' })
+		      .then(res => {
+		        console.log("Response status:", res.status);
+		        return res.text();
+		      })
+		      .then(text => {
+		        console.log("Response text:", text);
+		        try {
+		          const product = JSON.parse(text);
+		          if (product.message) {
+		            alert("Không tìm thấy sản phẩm.");
+		            return;
+		          }
+		          // Tiếp tục xử lý product ở đây
+		          document.getElementById("modalProductName").innerText = product.name || "Không rõ tên";
+		          document.getElementById("modalProductImage").src = "/uploads/" + (product.image || "default.png");
+		          document.getElementById("modalProductPrice").innerText = Number(product.price).toLocaleString('vi-VN') + " đ";
+		          document.getElementById("modalProductDescription").innerText = product.description || "Không có mô tả.";
+		          document.getElementById("modalProductCategory").innerText = product.categoryName || "Không rõ";
+		          
+		          $('#quickViewModal').modal('show');
+		        } catch (e) {
+		          console.error("Lỗi parse JSON:", e);
+		          alert("Lỗi khi lấy dữ liệu sản phẩm.");
+		        }
+		      })
+		      .catch(err => {
+		        console.error("Lỗi fetch:", err);
+		        alert("Lỗi khi lấy dữ liệu sản phẩm.");
+		      });
+
+		    });
+		  });
+		});
+</script>
+
+	<script>
+	$('#product-main-img').slick({
+		infinite: true,
+		speed: 300,
+		dots: false,
+		arrows: true,
+		fade: true,
+		asNavFor: '#product-imgs'
+	});
+
+	$('#product-imgs').slick({
+		slidesToShow: 3,
+		slidesToScroll: 1,
+		arrows: true,
+		centerMode: true,
+		focusOnSelect: true,
+		asNavFor: '#product-main-img'
+	});
+
+	$('#product-main-img .product-preview').zoom();
+</script>
+
+
+
+
+	<script>
+function updateFilter() {
+	const sort = document.getElementById('sort-select')?.value || '';
+	const show = document.getElementById('show-select')?.value || '6';
+	const url = new URL(window.location.href);
+
+	url.searchParams.set('sort', sort);
+	url.searchParams.set('show', show);
+	url.searchParams.set('page', 1); // reset về trang đầu tiên khi thay đổi
+
+	window.location.href = url.toString();
+}
+</script>
+</body>
+</html>

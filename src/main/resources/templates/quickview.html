@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+
+<head th:replace="layout/head :: head">
+<meta charset="UTF-8">
+<title th:text="${product.name}">Quick View</title>
+</head>
+
+<body>
+	<header th:replace="layout/header :: header"></header>
+
+	<!-- GIAO DIỆN QUICKVIEW BẮT ĐẦU -->
+	<nav id="navigation">
+		<div class="container">
+			<div id="responsive-nav">
+				<ul class="main-nav nav navbar-nav">
+					<li th:classappend="${product.categoryName == 'Home'} ? 'active'">
+						<a th:href="@{/}">Home</a>
+					</li>
+					<li
+						th:classappend="${product.categoryName == 'Hot Deals'} ? 'active'">
+						<a th:href="@{/deals}">Hot Deals</a>
+					</li>
+					<li
+						th:classappend="${product.categoryName == 'Categories'} ? 'active'">
+						<a th:href="@{/categories}">Categories</a>
+					</li>
+					<li
+						th:classappend="${product.categoryName == 'Laptops'} ? 'active'">
+						<a th:href="@{/laptops}">Laptops</a>
+					</li>
+					<li
+						th:classappend="${product.categoryName == 'Smartphones'} ? 'active'">
+						<a th:href="@{/smartphones}">Smartphones</a>
+					</li>
+					<li
+						th:classappend="${product.categoryName == 'Cameras'} ? 'active'">
+						<a th:href="@{/cameras}">Cameras</a>
+					</li>
+					<li
+						th:classappend="${product.categoryName == 'Accessories'} ? 'active'">
+						<a th:href="@{/accessories}">Accessories</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- BREADCRUMB -->
+	<
+	<div id="breadcrumb" class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<ul class="breadcrumb-tree">
+						<li><a th:href="@{/}">Home</a></li>
+						<li><a th:href="@{/${product.categoryName.toLowerCase()}}"
+							th:text="${product.categoryName}">Category</a></li>
+						<li class="active" th:text="${product.name}">Tên sản phẩm</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- /BREADCRUMB -->
+
+	<!-- SECTION -->
+	<div class="section">
+		<div class="container">
+			<div class="row">
+				<!-- Product Image -->
+				<div class="col-md-5">
+					<div class="product-img">
+						<img th:if="${product.image != null}"
+							th:src="@{'/uploads/' + ${product.image}}" alt="Ảnh sản phẩm"
+							class="img-responsive"> <img
+							th:unless="${product.image != null}" src="/images/default.png"
+							alt="Ảnh sản phẩm" class="img-responsive">
+					</div>
+				</div>
+
+				<!-- Product Details -->
+				<div class="col-md-7">
+					<div class="product-details">
+						<h2 class="product-name" th:text="${product.name}">Tên sản
+							phẩm</h2>
+						<div>
+							<div class="product-rating">
+								<i class="fa fa-star" th:each="i : ${#numbers.sequence(1,5)}"></i>
+							</div>
+						</div>
+						<div>
+							<h3 class="product-price"
+								th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></h3>
+							<span class="product-available">Còn hàng</span>
+						</div>
+						<p th:utext="${product.description}">Mô tả sản phẩm</p>
+						<p>
+							<strong>Danh mục:</strong> <span
+								th:text="${product.categoryName != '' ? product.categoryName : 'Không rõ'}">Không
+								rõ</span>
+						</p>
+
+						<div class="add-to-cart">
+							<div class="qty-label">
+								Số lượng
+								<div class="input-number">
+									<input type="number" value="1"> <span class="qty-up">+</span>
+									<span class="qty-down">-</span>
+								</div>
+							</div>
+							<button class="add-to-cart-btn">
+								<i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Đánh giá sản phẩm -->
+				<div class="col-md-12">
+					<div id="product-tab">
+						<!-- tab nav -->
+						<ul class="tab-nav">
+							<li class="active"><a data-toggle="tab" href="#tab1">Mô
+									tả</a></li>
+							<li><a data-toggle="tab" href="#tab3">Đánh giá (<span
+									th:text="${#lists.size(reviews)}">0</span>)
+							</a></li>
+
+						</ul>
+						<!-- /tab nav -->
+
+						<!-- tab content -->
+						<div class="tab-content">
+							<!-- Mô tả -->
+							<div id="tab1" class="tab-pane fade in active">
+								<div class="row">
+									<div class="col-md-12">
+										<p th:utext="${product.description}">Mô tả chi tiết sản
+											phẩm</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- Đánh giá -->
+							<div id="tab3" class="tab-pane fade">
+								<div class="row">
+									<!-- Cột đánh giá bên trái -->
+									<div class="col-md-6">
+										<div th:if="${#lists.isEmpty(reviews)}">
+											<p>Chưa có đánh giá nào.</p>
+										</div>
+										<div th:each="r : ${reviews}">
+											<div class="review">
+												<img src="/images/avatar.png" alt="">
+												<div class="review-body">
+													<h3 class="review-name" th:text="${r.customer.name}">Tên
+														người dùng</h3>
+													<p class="review-date"
+														th:text="${#temporals.format(r.created, 'dd/MM/yyyy')}">Ngày
+														tạo</p>
+													<div class="review-rating">
+														<i class="fa" th:each="i : ${#numbers.sequence(1,5)}"
+															th:classappend="${i <= r.starValue} ? 'fa-star' : 'fa-star-o'"></i>
+													</div>
+													<p th:text="${r.content}">Nội dung</p>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Cột form bên phải -->
+									<div class="col-md-6">
+										<h4 class="text-uppercase">Gửi đánh giá của bạn</h4>
+										<p>Email của bạn sẽ không được công khai.</p>
+										<form class="review-form" th:action="@{/laptops/review}"
+											method="post">
+											<input type="hidden" name="productId"
+												th:value="${product.id}" />
+											<div class="form-group">
+												<input class="input" type="text" name="customerName"
+													placeholder="Tên của bạn" required>
+											</div>
+											<div class="form-group">
+												<input class="input" type="email" name="email"
+													placeholder="Email của bạn" required>
+											</div>
+											<div class="form-group">
+												<textarea class="input" name="content"
+													placeholder="Nội dung đánh giá" required></textarea>
+											</div>
+											<div class="form-group">
+												<div class="input-rating">
+													<strong class="text-uppercase">Đánh giá: </strong> <select
+														name="starValue" class="input" required>
+														<option value="5">5 sao</option>
+														<option value="4">4 sao</option>
+														<option value="3">3 sao</option>
+														<option value="2">2 sao</option>
+														<option value="1">1 sao</option>
+													</select>
+												</div>
+											</div>
+											<button type="submit" class="primary-btn">Gửi</button>
+										</form>
+									</div>
+								</div>
+							</div>
+							<!-- /Đánh giá -->
+						</div>
+						<!-- /tab content -->
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<!-- Related Products -->
+	<div class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="section-title text-center">
+						<h3 class="title">Sản phẩm liên quan</h3>
+					</div>
+				</div>
+
+				<!-- Product -->
+				<div class="col-md-3 col-xs-6" th:each="item : ${relatedProducts}">
+					<div class="product">
+						<div class="product-img">
+							<img th:src="@{'/uploads/' + ${item.image}}" alt="">
+							<div class="product-label">
+								<span class="sale">-30%</span>
+							</div>
+						</div>
+						<div class="product-body">
+							<p class="product-category">
+								<span th:if="${item.category != null}"
+									th:text="${item.category.name}">Danh mục</span> <span
+									th:unless="${item.category != null}">Không rõ</span>
+							</p>
+							<h3 class="product-name">
+								<a th:href="@{'/produc/' + ${item.id}}" th:text="${item.name}">Tên
+									sản phẩm</a>t
+							</h3>
+							<h4 class="product-price"
+								th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+								0 đ
+								<del class="product-old-price">0 đ</del>
+							</h4>
+							<div class="product-rating">
+								<i class="fa fa-star"></i><i class="fa fa-star"></i><i
+									class="fa fa-star"></i> <i class="fa fa-star"></i><i
+									class="fa fa-star-o"></i>
+							</div>
+							<div class="product-btns mt-auto">
+								<a th:href="@{/product/quickview/{id}(id=${item.id})}"
+									class="btn btn-sm btn-outline-info"> <i class="fa fa-eye"></i>
+									Quick View
+								</a>
+							</div>
+						</div>
+						<div class="add-to-cart">
+							<button class="add-to-cart-btn">
+								<i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /Product -->
+
+				<div class="clearfix visible-sm visible-xs"></div>
+			</div>
+		</div>
+	</div>
+	<!-- /Related Products -->
+
+	<!-- /SECTION -->
+
+	<footer th:replace="layout/footer :: footer"></footer>
+	<script th:replace="layout/script :: script"></script>
+</body>
+</html>

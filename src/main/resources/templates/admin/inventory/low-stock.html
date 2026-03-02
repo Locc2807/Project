@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto">
+			<main class="flex-1 p-6">
+				<h1 class="text-3xl font-bold text-gray-800 mb-6">Sản phẩm Sắp hết hàng</h1>
+
+				<div class="mb-4">
+					<a th:href="@{/admin/inventory}" 
+						class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+						<i class="fa-solid fa-arrow-left"></i> Quay lại
+					</a>
+				</div>
+
+				<!-- Low Stock Table -->
+				<div class="bg-white p-6 rounded-xl shadow">
+					<h2 class="text-xl font-semibold text-red-600 mb-4">
+						<i class="fa-solid fa-exclamation-triangle"></i> 
+						Danh sách sản phẩm cần nhập thêm
+					</h2>
+
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Sản phẩm</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Hình ảnh</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Số lượng</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Mức tối thiểu</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Cần nhập</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Hành động</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200">
+							<tr th:each="inventory : ${inventories}">
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${inventory.product.name}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700">
+									<img th:src="@{'/uploads/' + ${inventory.product.image}}" alt="image"
+										class="h-12 w-12 object-cover rounded">
+								</td>
+								<td class="px-4 py-2 text-sm font-semibold text-red-600" 
+									th:text="${inventory.quantity}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700" 
+									th:text="${inventory.minStockLevel}"></td>
+								<td class="px-4 py-2 text-sm font-semibold text-orange-600" 
+									th:text="${inventory.minStockLevel - inventory.quantity + 10}"></td>
+								<td class="px-4 py-2 space-x-2">
+									<a th:href="@{/admin/inventory/adjust/{id}(id=${inventory.product.id})}"
+										class="text-green-600 hover:underline text-sm">
+										<i class="fa-solid fa-plus-circle"></i> Nhập kho
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Pagination -->
+					<div class="flex justify-end mt-4">
+						<ul class="inline-flex -space-x-px text-sm">
+							<li th:if="${currentPage > 1}">
+								<a th:href="@{'?pageNo=' + ${currentPage - 1}}"
+									class="px-3 py-1 rounded-l bg-gray-100 border border-gray-300 hover:bg-gray-200">&laquo;</a>
+							</li>
+							<li th:each="i:${#numbers.sequence(1, totalPages)}"
+								th:classappend="${currentPage == i ? 'active' : ''}">
+								<a th:href="@{'?pageNo=' + ${i}}"
+									th:text="${i}"
+									class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100"></a>
+							</li>
+							<li th:if="${currentPage < totalPages}">
+								<a th:href="@{'?pageNo=' + ${currentPage + 1}}"
+									class="px-3 py-1 rounded-r bg-gray-100 border border-gray-300 hover:bg-gray-200">&raquo;</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</div>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 min-h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main content -->
+		<main class="flex-1 p-6">
+			<div class="bg-white rounded-xl shadow-md p-6">
+				<h2 class="text-2xl font-bold mb-4 text-gray-800">Quản lý đơn
+					hàng</h2>
+
+				<!-- Bộ lọc -->
+				<form method="get" th:action="@{/admin/order}"
+					class="flex flex-wrap gap-4 mb-4">
+					<select class="border rounded px-3 py-2" name="status"
+						id="statusFilter">
+						<option value="">Tất cả</option>
+						<option value="1">Chờ xử lý</option>
+						<option value="2">Đã xác nhận</option>
+						<option value="3">Đang chuyển hàng</option>
+						<option value="4">Đang giao hàng</option>
+						<option value="5">Đã hủy</option>
+						<option value="6">Thành công</option>
+					</select> <input type="text" name="keyword"
+						placeholder="Tìm theo tên KH hoặc mã đơn"
+						class="border rounded px-3 py-2 flex-1">
+					<button type="submit"
+						class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Lọc</button>
+				</form>
+
+				<!-- Bảng đơn hàng -->
+				<div class="overflow-x-auto">
+					<table class="min-w-full bg-white border text-sm">
+						<thead>
+							<tr class="bg-gray-100 text-left uppercase text-gray-600">
+								<th class="py-2 px-4 border">Mã đơn</th>
+								<th class="py-2 px-4 border">Khách hàng</th>
+								<th class="py-2 px-4 border">Tổng tiền</th>
+								<th class="py-2 px-4 border">Ngày đặt</th>
+								<th class="py-2 px-4 border">Trạng thái</th>
+								<th class="py-2 px-4 border">Hành động</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="wrapper : ${orders}"
+								class="border-b hover:bg-gray-50">
+								<td class="py-2 px-4 border" th:text="${wrapper.order.id}">Mã</td>
+								<td class="py-2 px-4 border"
+									th:text="${wrapper.order.customer.name}">Tên KH</td>
+								<td class="py-2 px-4 border text-red-600 font-semibold"><span
+									th:text="${wrapper.formattedTotalPrice + '₫'}">0₫</span></td>
+								<td class="py-2 px-4 border"
+									th:text="${wrapper.formattedCreatedDate}">Ngày</td>
+
+								<!-- Trạng thái -->
+								<td class="py-2 px-4 border"><span
+									th:switch="${wrapper.order.status}"> <span th:case="1"
+										class="text-yellow-600 font-medium">Chờ xác nhận</span> <span
+										th:case="2" class="text-blue-600 font-medium">Đã xác
+											nhận</span> <span th:case="3" class="text-indigo-600 font-medium">Đang
+											chuyển</span> <span th:case="4" class="text-purple-600 font-medium">Đang
+											giao</span> <span th:case="5" class="text-gray-500 font-medium">Đã
+											hủy</span> <span th:case="6" class="text-green-600 font-medium">Thành
+											công</span> <span th:case="7" class="text-red-600 font-medium">Yêu
+											cầu hủy</span> <span th:case="*">Không rõ</span>
+								</span></td>
+
+								<!-- Hành động -->
+								<td class="py-2 px-4 border space-x-2"><a
+									th:href="@{'/admin/order/' + ${wrapper.order.id}}"
+									class="text-blue-600 hover:underline">Xem</a> <!-- Chờ xác nhận -->
+									<a th:href="@{'/admin/order/confirm/' + ${wrapper.order.id}}"
+									th:if="${wrapper.order.status == 1}"
+									class="text-green-600 hover:underline">Duyệt</a> <a
+									th:href="@{'/admin/order/cancel/' + ${wrapper.order.id}}"
+									th:if="${wrapper.order.status == 1}"
+									class="text-red-600 hover:underline">Hủy</a> <!-- Yêu cầu hủy -->
+									<a th:href="@{'/admin/order/cancel/' + ${wrapper.order.id}}"
+									th:if="${wrapper.order.status == 7}"
+									class="text-red-600 hover:underline">Phê duyệt hủy</a> <!-- Chuyển trạng thái -->
+									<a
+									th:href="@{'/admin/order/updateStatus/' + ${wrapper.order.id} + '/3'}"
+									th:if="${wrapper.order.status == 2}"
+									class="text-indigo-600 hover:underline">Chuyển hàng</a> <a
+									th:href="@{'/admin/order/updateStatus/' + ${wrapper.order.id} + '/4'}"
+									th:if="${wrapper.order.status == 3}"
+									class="text-purple-600 hover:underline">Giao hàng</a> <a
+									th:href="@{'/admin/order/updateStatus/' + ${wrapper.order.id} + '/6'}"
+									th:if="${wrapper.order.status == 4}"
+									class="text-green-600 hover:underline">Hoàn thành</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer" class="mt-6"></div>
+		</main>
+	</div>
+
+	<!-- Toast -->
+	<div id="toast"
+		class="fixed bottom-5 right-5 hidden bg-green-600 text-white px-4 py-2 rounded shadow z-50">
+		Đã chọn mục</div>
+
+	<!-- Script -->
+	<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

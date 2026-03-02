@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+	<header th:replace="admin/fragment/header :: header"></header>
+
+	<div class="flex pt-14 min-h-screen">
+		<aside th:replace="admin/fragment/aside :: aside"></aside>
+
+		<main class="flex-1 p-6">
+			<h1 class="text-xl font-bold mb-4">
+				Đơn hàng của <span th:text="${customer.name}">Tên khách</span>
+			</h1>
+
+			<table
+				class="min-w-full bg-white shadow-md rounded text-sm divide-y divide-gray-200">
+				<thead class="bg-gray-100">
+					<tr>
+						<th class="px-4 py-2 text-left">Mã đơn</th>
+						<th class="px-4 py-2 text-left">Ngày đặt</th>
+						<th class="px-4 py-2 text-left">Tổng tiền</th>
+						<th class="px-4 py-2 text-left">Trạng thái</th>
+					</tr>
+				</thead>
+				<tbody th:if="${orders != null}">
+					<tr th:each="orderVM : ${orders}">
+						<td class="px-4 py-2" th:text="${orderVM.order.id}"></td>
+						<td class="px-4 py-2" th:text="${orderVM.formattedCreatedDate}"></td>
+						<td class="px-4 py-2" th:text="${orderVM.formattedTotalPrice}"></td>
+						<td class="px-4 py-2" th:text="${orderVM.statusText}"></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<a th:href="@{/admin/customer}"
+				class="text-blue-600 hover:underline mt-4 inline-block">← Quay
+				lại danh sách khách</a>
+		</main>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head th:replace="admin/fragment/head :: head"></head>
+
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto">
+			<main class="flex-1 p-6">
+				<h1 class="text-3xl font-bold text-gray-800 mb-6">Chào mừng đến
+					với danh mục</h1>
+
+				<!-- Flash messages -->
+				<div th:if="${success}"
+					class="bg-green-100 text-green-800 p-2 rounded mb-4"
+					th:text="${success}"></div>
+				<div th:if="${error}"
+					class="bg-red-100 text-red-800 p-2 rounded mb-4" th:text="${error}"></div>
+
+				<form th:action="@{/admin/category}" method="get"
+					class="mb-4 flex gap-2">
+					<input type="text" name="keyword" th:value="${keyword}"
+						class="form-control border px-2 py-1 rounded"
+						placeholder="Tìm kiếm">
+					<button type="submit"
+						class="btn btn-default px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">
+						<i class="fa-solid fa-search"></i>
+					</button>
+				</form>
+
+				<!-- Quản lý danh mục -->
+				<div class="bg-white p-6 rounded-xl shadow mb-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Thêm danh
+						mục</h2>
+					<a th:href="@{/admin/add-category}"
+						class="inline-block text-center bg-primary text-white px-4 py-2 rounded hover:bg-indigo-600 transition shadow">
+						Thêm </a>
+				</div>
+
+				<div class="bg-white p-6 rounded-xl shadow">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Danh sách
+						danh mục</h2>
+					<p id="totalCategory" class="text-sm text-gray-500 mt-2"></p>
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th
+									class="px-4 py-2 text-left text-sm font-semibold text-gray-600">ID</th>
+								<th
+									class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Ảnh</th>
+								<th
+									class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tên
+									danh mục</th>
+								<th
+									class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Status</th>
+								<th
+									class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Hành
+									động</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200">
+							<tr th:each="category : ${list}">
+								<td class="px-4 py-2 text-sm text-gray-700"
+									th:text="${category.id}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700"><img
+									th:src="@{'/uploads/' + ${category.image}}" alt="image"
+									class="h-12 w-12 object-cover rounded"></td>
+								<td class="px-4 py-2 text-sm text-gray-700"
+									th:text="${category.name}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700"><span
+									th:if="${category.status}"
+									class="inline-block px-2 py-1 text-xs font-semibold text-white bg-green-500 rounded">Hiện</span>
+									<span th:if="${!category.status}"
+									class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded">Ẩn</span>
+								</td>
+								<td class="px-4 py-2 space-x-2"><a
+									th:href="@{/admin/edit-category/{id}(id=${category.id})}"
+									class="text-blue-600 hover:underline text-sm">Sửa</a> <a
+									th:href="@{/admin/delete-category/{id}(id=${category.id})}"
+									onclick="return confirm('Bạn có chắc không ?')"
+									class="text-red-600 hover:underline text-sm">Xóa</a></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Pagination -->
+					<div class="flex justify-end mt-4">
+						<ul class="inline-flex -space-x-px text-sm">
+							<li th:if="${currentPage > 1}"><a
+								th:href="@{'?pageNo=' + ${currentPage - 1}}"
+								class="px-3 py-1 rounded-l bg-gray-100 border border-gray-300 hover:bg-gray-200">&laquo;</a>
+							</li>
+							<li th:each="i:${#numbers.sequence(1, totalPage)}"
+								th:classappend="${currentPage == i ? 'active' : ''}"><a
+								th:href="@{${keyword != null && keyword != '' ? '?keyword=' + keyword + '&' : '?'} + 'pageNo=' + ${i}}"
+								th:text="${i}"
+								class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100"></a>
+							</li>
+							<li th:if="${currentPage < totalPage}"><a
+								th:href="@{'?pageNo=' + ${currentPage + 1}}"
+								class="px-3 py-1 rounded-r bg-gray-100 border border-gray-300 hover:bg-gray-200">&raquo;</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</div>
+	</div>
+
+	<!-- Toast -->
+	<div id="toast"
+		class="fixed bottom-5 right-5 hidden bg-green-600 text-white px-4 py-2 rounded shadow z-50">
+		Đã chọn mục</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+
+</body>
+
+</html>

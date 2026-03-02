@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+
+<head th:replace="layout/head :: head">
+<meta charset="UTF-8">
+<title>Hot Deals - TechZone</title>
+</head>
+
+<body>
+	<header th:replace="layout/header :: header"></header>
+
+	<nav id="navigation">
+		<div class="container">
+			<div id="responsive-nav">
+				<ul class="main-nav nav navbar-nav">
+					<li><a th:href="@{/}">Home</a></li>
+					<li class="active"><a th:href="@{/deals}">Hot Deals</a></li>
+					<li><a th:href="@{/categories}">Categories</a></li>
+					<li><a th:href="@{/laptops}">Laptops</a></li>
+					<li><a th:href="@{/smartphones}">Smartphones</a></li>
+					<li><a th:href="@{/cameras}">Cameras</a></li>
+					<li><a th:href="@{/accessories}">Accessories</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div id="breadcrumb" class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<ul class="breadcrumb-tree">
+						<li><a th:href="@{/}">Home</a></li>
+						<li class="active" th:text="${breadcrumbTitle}">Hot Deals</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<section
+		style="padding: 50px 0; background-color: #f9f9f9; margin-top: 50px; margin-bottom: 50px;">
+		<div class="container text-center">
+			<h2
+				style="color: #d9534f; font-weight: bold; text-transform: uppercase; margin-bottom: 20px;">
+				🔥 Hot Deals This Week 🔥</h2>
+			<p style="color: #777; margin-bottom: 40px;">Số lượng có hạn - Ưu
+				đãi chỉ trong tuần này!</p>
+
+			<div class="row">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"
+					th:each="deal : ${dealVMs}">
+					<div class="panel panel-default">
+						<div class="position-relative">
+							<img th:src="@{'/uploads/' + ${deal.productImage}}"
+								th:alt="${deal.title}" th:title="${deal.title}"
+								class="img-responsive"
+								style="height: 200px; object-fit: cover; width: 100%;">
+						</div>
+
+						<div class="panel-body text-center">
+							<h5 th:text="${deal.productName}" style="margin-top: 10px;">Tên
+								sản phẩm</h5>
+
+							<p>
+								<s class="text-muted" th:text="${deal.formattedOriginalPrice}">Giá
+									gốc</s> <span style="color: red; margin-left: 5px;"
+									th:text="'-' + ${deal.discountPercent} + '%'">-20%</span>
+							</p>
+
+							<p>
+								<strong style="color: red;"
+									th:text="${deal.formattedDiscountedPrice}">Giá giảm</strong>
+							</p>
+
+							<a href="#" class="btn btn-danger btn-sm">Mua ngay</a>
+
+							<div style="margin-top: 15px;">
+								<small>Kết thúc lúc: <span style="color: red;"
+									th:text="${deal.formattedEndDate}">01/01/2025</span></small>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer th:replace="layout/footer :: footer"></footer>
+	<script th:replace="layout/script :: script"></script>
+</body>
+</html>

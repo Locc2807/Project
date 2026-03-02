@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+	<header th:replace="admin/fragment/header :: header"></header>
+
+	<div class="flex pt-14 min-h-screen">
+		<aside th:replace="admin/fragment/aside :: aside"></aside>
+
+		<main class="flex-1 p-6">
+			<h2 class="text-xl font-bold mb-4">Đánh giá của
+				[[${customer.name}]]</h2>
+
+			<table class="min-w-full bg-white text-sm">
+				<thead>
+					<tr class="bg-gray-100">
+						<th class="px-4 py-2 text-left">Sản phẩm</th>
+						<th class="px-4 py-2 text-left">Nội dung</th>
+						<th class="px-4 py-2 text-left">Số sao</th>
+						<th class="px-4 py-2 text-left">Ngày đánh giá</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="review : ${reviews}">
+						<td class="px-4 py-2" th:text="${review.productName}"></td>
+						<td class="px-4 py-2" th:text="${review.content}"></td>
+						<td class="px-4 py-2" th:text="${review.starDisplay}"></td>
+						<td class="px-4 py-2"
+							th:text="${review.formattedCreatedDate}"></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<a th:href="@{/admin/customer}"
+				class="text-blue-600 hover:underline mt-4 inline-block">← Quay
+				lại danh sách khách</a>
+		</main>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

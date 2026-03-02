@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+
+<head th:replace="layout/head :: head">
+<meta charset="UTF-8">
+<title>Categories - TechZone</title>
+</head>
+
+<body>
+	<header th:replace="layout/header :: header"></header>
+
+	<!-- NAVIGATION -->
+	<nav id="navigation">
+		<div class="container">
+			<div id="responsive-nav">
+				<ul class="main-nav nav navbar-nav">
+					<li><a th:href="@{/}">Home</a></li>
+					<li><a th:href="@{/deals}">Hot Deals</a></li>
+					<li class="active"><a th:href="@{/categories}">Categories</a></li>
+					<li><a th:href="@{/laptops}">Laptops</a></li>
+					<li><a th:href="@{/smartphones}">Smartphones</a></li>
+					<li><a th:href="@{/cameras}">Cameras</a></li>
+					<li><a th:href="@{/accessories}">Accessories</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- NAVIGATION -->
+
+	<!-- BREADCRUMB -->
+	<div id="breadcrumb" class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<ul class="breadcrumb-tree">
+						<li><a th:href="@{/}">Home</a></li>
+						<li class="active">All Categories</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- SECTION -->
+	<div class="section">
+		<div class="container">
+			<div class="row">
+
+				<!-- ASIDE -->
+				<div id="aside" class="col-md-3">
+
+					<form method="get" th:action="@{/categories}"
+						id="categoryFilterForm">
+						<h3 class="aside-title">Danh mục</h3>
+						<div class="checkbox-filter">
+							<div class="input-checkbox">
+								<input type="checkbox" id="category-1" name="id" value="1"
+									onchange="document.getElementById('categoryFilterForm').submit();"
+									th:checked="${selectedId == 1}" /> <label for="category-1"><span></span>Laptops</label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" id="category-2" name="id" value="2"
+									onchange="document.getElementById('categoryFilterForm').submit();"
+									th:checked="${selectedId == 2}" /> <label for="category-2"><span></span>Smartphones</label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" id="category-3" name="id" value="3"
+									onchange="document.getElementById('categoryFilterForm').submit();"
+									th:checked="${selectedId == 3}" /> <label for="category-3"><span></span>Cameras</label>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" id="category-4" name="id" value="4"
+									onchange="document.getElementById('categoryFilterForm').submit();"
+									th:checked="${selectedId == 4}" /> <label for="category-4"><span></span>Accessories</label>
+							</div>
+						</div>
+					</form>
+
+				</div>
+				<!-- /ASIDE -->
+
+				<!-- MAIN CONTENT -->
+				<div class="col-md-9">
+					<h3 class="text-center" style="margin-bottom: 30px;">Danh mục
+						sản phẩm</h3>
+					<div class="row">
+
+						<!-- Category Item -->
+						<div class="col-md-6 col-sm-6" th:each="cat : ${categories}">
+							<div class="category-box text-center"
+								style="border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 30px; transition: 0.3s; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);">
+								<img th:src="@{'/uploads/' + ${cat.image}}" alt="Ảnh danh mục"
+									style="height: 120px; object-fit: contain; margin-bottom: 15px;" />
+								<h4>
+									<a th:href="@{'/categories/' + ${cat.id}}"
+										th:text="${cat.name}"
+										style="text-decoration: none; color: #333;"></a>
+								</h4>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<!-- /MAIN CONTENT -->
+
+			</div>
+		</div>
+	</div>
+
+	<footer th:replace="layout/footer :: footer"></footer>
+	<script th:replace="layout/script :: script"></script>
+</body>
+</html>

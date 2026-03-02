@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto">
+			<main class="flex-1 p-6">
+				<h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+
+				<!-- Box thống kê -->
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+					<div
+						class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+						<p class="text-gray-500">Tổng sản phẩm</p>
+						<h2 id="product-count" class="text-2xl font-semibold text-primary">0</h2>
+					</div>
+					<div
+						class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+						<p class="text-gray-500">Đơn hàng hôm nay</p>
+						<h2 id="order-count" class="text-2xl font-semibold text-primary">0</h2>
+					</div>
+					<div
+						class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+						<p class="text-gray-500">Khách hàng</p>
+						<h2 id="user-count" class="text-2xl font-semibold text-primary">0</h2>
+					</div>
+					<div
+						class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+						<p class="text-gray-500">Doanh thu</p>
+						<h2 id="revenue-count" class="text-2xl font-semibold text-primary">₫0</h2>
+					</div>
+				</div>
+
+				<!-- Chart -->
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					<!-- Chart: Orders -->
+					<div class="bg-white p-5 rounded-xl shadow">
+						<h3 class="text-xl font-semibold mb-4">Đơn hàng theo tháng</h3>
+						<canvas id="ordersChart" height="120"></canvas>
+					</div>
+
+					<!-- Chart: Revenue -->
+					<div class="bg-white p-5 rounded-xl shadow">
+						<h3 class="text-xl font-semibold mb-4">Doanh thu theo tháng</h3>
+						<canvas id="revenueChart" height="120"></canvas>
+					</div>
+
+					<div class="bg-white p-5 rounded-xl shadow">
+						<h3 class="text-xl font-semibold mb-4">Sản phẩm theo danh mục</h3>
+						<canvas id="productChart" height="120"></canvas>
+					</div>
+
+					<div class="bg-white p-5 rounded-xl shadow">
+						<h3 class="text-xl font-semibold mb-4">Khách hàng theo tháng</h3>
+						<canvas id="userChart" height="120"></canvas>
+					</div>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</div>
+	</div>
+
+	<!-- Toast -->
+	<div id="toast"
+		class="fixed bottom-5 right-5 hidden bg-green-600 text-white px-4 py-2 rounded shadow z-50">
+		Đã chọn mục</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+	<div th:replace="admin/fragment/script :: chartScript"></div>
+</body>
+</html>

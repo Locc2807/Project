@@ -1,0 +1,105 @@
+<aside id="sidebar" th:fragment="aside"
+	class="w-64 bg-white shadow-lg flex flex-col transition-all duration-300 ease-in-out h-full">
+	<div
+		class="flex items-center justify-between p-4 border-b border-gray-200">
+		<div class="flex items-center gap-3">
+			<img src="https://i.pravatar.cc/50?img=3" alt="Avatar"
+				class="w-10 h-10 rounded-full" />
+			<div id="user-info">
+				<p class="font-semibold text-gray-800">Admin</p>
+				<p class="text-sm text-green-600">Online</p>
+			</div>
+		</div>
+		<button onclick="toggleSidebar()"
+			class="w-10 h-10 flex items-center justify-center rounded hover:bg-gray-100">
+			<i id="sidebar-toggle-icon" data-lucide="menu"
+				class="w-5 h-5 text-gray-500"></i>
+		</button>
+	</div>
+	<nav class="flex-1 p-4 space-y-2 text-gray-700">
+		<a th:href="@{/admin/dashboard}" onclick="showToast('Dashboard')"
+			class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition">
+			<i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span
+			class="menu-label">Dashboard</span>
+		</a>
+		<!-- Quản lý sản phẩm với menu con -->
+		<div>
+			<button type="button"
+				class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition"
+				onclick="toggleSubMenu('product-submenu')">
+				<i data-lucide="package-open" class="w-5 h-5"></i> <span
+					class="menu-label">Quản lý sản phẩm</span>
+				<svg class="ml-auto w-4 h-4" fill="none" stroke="currentColor"
+					stroke-width="2" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round"
+						d="M19 9l-7 7-7-7" />
+				</svg>
+			</button>
+			<div id="product-submenu"
+				class="pl-8 hidden flex flex-col space-y-1 mt-1">
+				<a th:href="@{/admin/product}"
+					class="text-sm text-gray-700 hover:text-primary transition">Danh
+					sách</a> <a th:href="@{/admin/add-product}"
+					class="text-sm text-gray-700 hover:text-primary transition">Thêm
+					mới</a>
+			</div>
+		</div>
+
+		<a th:href="@{/admin/category}" onclick="showToast('Quản lý danh mục')"
+			class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition">
+			<i data-lucide="list" class="w-5 h-5"></i> <span class="menu-label">Quản
+				lý danh mục</span>
+		</a>
+		
+		<!-- Quản lý kho hàng với menu con -->
+		<div>
+			<button type="button"
+				class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition"
+				onclick="toggleSubMenu('inventory-submenu')">
+				<i data-lucide="warehouse" class="w-5 h-5"></i> <span
+					class="menu-label">Quản lý kho hàng</span>
+				<svg class="ml-auto w-4 h-4" fill="none" stroke="currentColor"
+					stroke-width="2" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round"
+						d="M19 9l-7 7-7-7" />
+				</svg>
+			</button>
+			<div id="inventory-submenu"
+				class="pl-8 hidden flex flex-col space-y-1 mt-1">
+				<a th:href="@{/admin/inventory}"
+					class="text-sm text-gray-700 hover:text-primary transition">Danh sách tồn kho</a>
+				<a th:href="@{/admin/inventory/low-stock}"
+					class="text-sm text-red-600 hover:text-red-700 transition">Sắp hết hàng</a>
+				<a th:href="@{/admin/inventory/transactions}"
+					class="text-sm text-gray-700 hover:text-primary transition">Lịch sử giao dịch</a>
+			</div>
+		</div>
+		
+		<a th:href="@{/admin/order}"
+			class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition">
+			<i data-lucide="shopping-cart" class="w-5 h-5"></i> <span
+			class="menu-label">Quản lý đơn hàng</span>
+		</a> <a th:href="@{/admin/customer}"
+			class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition">
+			<i data-lucide="users" class="w-5 h-5"></i> <span class="menu-label">Quản
+				lý khách hàng</span>
+		</a> <a th:href="@{/admin/banner}" onclick="showToast('Quản lý banner')"
+			class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition">
+			<i data-lucide="image" class="w-5 h-5"></i><span class="menu-label">Quản
+				lý banner</span>
+		</a> <a th:href="@{/admin/hotdeal}"
+			onclick="showToast('Quản lý Hot Deals')"
+			class="sidebar-button flex items-center gap-2 w-full px-4 py-2 rounded hover:bg-primary hover:text-white transition">
+			<i data-lucide="flame" class="w-5 h-5"></i> <span class="menu-label">Quản
+				lý Hot Deals</span>
+		</a>
+	</nav>
+	<div class="p-4 border-t border-gray-200">
+		<a th:href="@{/admin-logout}" id="auth-btn" onclick="toggleAuth()"
+			class="sidebar-button flex items-center gap-2 w-full justify-start pl-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white transition">
+			<i data-lucide="log-out" class="w-4 h-4"></i> <span id="auth-label"
+			class="menu-label">Logout</span>
+		</a>
+
+	</div>
+</aside>

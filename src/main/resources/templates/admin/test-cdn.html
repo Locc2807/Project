@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CDN Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-item {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .loading {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <h1>CDN Loading Test</h1>
+    <p>Testing all CDN resources...</p>
+    
+    <div id="results"></div>
+    
+    <script>
+        const cdnTests = [
+            { name: 'Tailwind CSS', url: 'https://cdn.tailwindcss.com', type: 'script' },
+            { name: 'jQuery', url: 'https://code.jquery.com/jquery-3.6.0.min.js', type: 'script' },
+            { name: 'Font Awesome', url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css', type: 'link' },
+            { name: 'Summernote CSS', url: 'https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css', type: 'link' },
+            { name: 'Summernote JS', url: 'https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js', type: 'script' },
+            { name: 'Lucide Icons', url: 'https://unpkg.com/lucide@latest', type: 'script' },
+            { name: 'Chart.js', url: 'https://cdn.jsdelivr.net/npm/chart.js', type: 'script' }
+        ];
+        
+        const resultsDiv = document.getElementById('results');
+        
+        function testResource(test) {
+            return new Promise((resolve) => {
+                const startTime = Date.now();
+                const element = test.type === 'script' 
+                    ? document.createElement('script')
+                    : document.createElement('link');
+                
+                if (test.type === 'script') {
+                    element.src = test.url;
+                } else {
+                    element.rel = 'stylesheet';
+                    element.href = test.url;
+                }
+                
+                element.onload = () => {
+                    const loadTime = Date.now() - startTime;
+                    resolve({ 
+                        name: test.name, 
+                        status: 'success', 
+                        time: loadTime,
+                        message: `Loaded in ${loadTime}ms`
+                    });
+                };
+                
+                element.onerror = () => {
+                    const loadTime = Date.now() - startTime;
+                    resolve({ 
+                        name: test.name, 
+                        status: 'error', 
+                        time: loadTime,
+                        message: 'Failed to load'
+                    });
+                };
+                
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    resolve({ 
+                        name: test.name, 
+                        status: 'error', 
+                        time: 10000,
+                        message: 'Timeout (10s)'
+                    });
+                }, 10000);
+                
+                document.head.appendChild(element);
+            });
+        }
+        
+        function displayResult(result) {
+            const div = document.createElement('div');
+            div.className = `test-item ${result.status}`;
+            div.innerHTML = `
+                <strong>${result.name}</strong>: 
+                <span>${result.message}</span>
+            `;
+            resultsDiv.appendChild(div);
+        }
+        
+        async function runTests() {
+            for (const test of cdnTests) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'test-item loading';
+                loadingDiv.innerHTML = `<strong>${test.name}</strong>: Loading...`;
+                resultsDiv.appendChild(loadingDiv);
+                
+                const result = await testResource(test);
+                resultsDiv.removeChild(loadingDiv);
+                displayResult(result);
+            }
+            
+            const summary = document.createElement('div');
+            summary.style.marginTop = '20px';
+            summary.style.padding = '15px';
+            summary.style.backgroundColor = '#e7f3ff';
+            summary.style.borderRadius = '5px';
+            summary.innerHTML = '<h3>Test Complete!</h3><p>Check the results above.</p>';
+            resultsDiv.appendChild(summary);
+        }
+        
+        runTests();
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto">
+			<main class="flex-1 p-6">
+				<h1 class="text-3xl font-bold text-gray-800 mb-6">Thêm Tồn kho</h1>
+
+				<div class="bg-white p-6 rounded-xl shadow max-w-2xl">
+					<form th:action="@{/admin/inventory/add}" method="post" th:object="${inventory}">
+						<div class="mb-4">
+							<label class="block text-sm font-semibold text-gray-700 mb-2">Sản phẩm</label>
+							<select th:field="*{product.id}" class="w-full border px-3 py-2 rounded" required>
+								<option value="">-- Chọn sản phẩm --</option>
+								<option th:each="product : ${products}" 
+									th:value="${product.id}" 
+									th:text="${product.name}"></option>
+							</select>
+						</div>
+
+						<div class="mb-4">
+							<label class="block text-sm font-semibold text-gray-700 mb-2">Số lượng</label>
+							<input type="number" th:field="*{quantity}" 
+								class="w-full border px-3 py-2 rounded" 
+								min="0" required>
+						</div>
+
+						<div class="mb-4">
+							<label class="block text-sm font-semibold text-gray-700 mb-2">Mức tồn kho tối thiểu</label>
+							<input type="number" th:field="*{minStockLevel}" 
+								class="w-full border px-3 py-2 rounded" 
+								min="0" required>
+						</div>
+
+						<div class="flex gap-2">
+							<button type="submit" 
+								class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+								<i class="fa-solid fa-save"></i> Lưu
+							</button>
+							<a th:href="@{/admin/inventory}" 
+								class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+								<i class="fa-solid fa-times"></i> Hủy
+							</a>
+						</div>
+					</form>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</div>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+
+</body>
+</html>

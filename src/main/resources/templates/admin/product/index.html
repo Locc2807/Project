@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto">
+			<main class="flex-1 p-6">
+				<h1 class="text-3xl font-bold text-gray-800 mb-6">Chào mừng đến
+					với Sản phẩm</h1>
+
+				<!-- Flash messages -->
+				<div th:if="${success}"
+					class="bg-green-100 text-green-800 p-2 rounded mb-4"
+					th:text="${success}"></div>
+				<div th:if="${error}"
+					class="bg-red-100 text-red-800 p-2 rounded mb-4" th:text="${error}"></div>
+
+				<!-- Search & Filter -->
+				<div class="mb-4 flex gap-2 items-center flex-wrap">
+					<form th:action="@{/admin/product}" method="get" class="flex gap-2 flex-1">
+						<input type="text" name="keyword" th:value="${keyword}"
+							class="form-control border px-2 py-1 rounded flex-1"
+							placeholder="Tìm kiếm sản phẩm...">
+						<select name="stockStatus" class="border px-2 py-1 rounded">
+							<option value="">Tất cả tồn kho</option>
+							<option value="available" th:selected="${stockStatus == 'available'}">Còn hàng</option>
+							<option value="low" th:selected="${stockStatus == 'low'}">Sắp hết hàng</option>
+							<option value="out" th:selected="${stockStatus == 'out'}">Hết hàng</option>
+						</select>
+						<button type="submit"
+							class="btn btn-default px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">
+							<i class="fa-solid fa-search"></i> Tìm
+						</button>
+					</form>
+					
+					<!-- Bulk Actions -->
+					<div class="flex gap-2">
+						<button onclick="bulkUpdateStatus(true)" 
+							class="px-3 py-1 rounded bg-green-500 text-white hover:bg-green-600">
+							<i class="fa-solid fa-check"></i> Bật đã chọn
+						</button>
+						<button onclick="bulkUpdateStatus(false)" 
+							class="px-3 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600">
+							<i class="fa-solid fa-ban"></i> Tắt đã chọn
+						</button>
+						<button onclick="bulkDelete()" 
+							class="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">
+							<i class="fa-solid fa-trash"></i> Xóa đã chọn
+						</button>
+					</div>
+				</div>
+
+				<!-- Quản lý sản phẩm -->
+
+				<div class="bg-white p-6 rounded-xl shadow">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Danh sách
+						sản phẩm</h2>
+
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-2 py-2 text-left text-sm font-semibold text-gray-600">
+									<input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" 
+										class="rounded border-gray-300">
+								</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">ID</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Ảnh</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tên</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tồn kho</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Trạng thái</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Giá</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Danh mục</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Hành động</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200">
+							<tr th:each="dto : ${listProduct}">
+								<td class="px-2 py-2">
+									<input type="checkbox" th:value="${dto.product.id}" 
+										class="product-checkbox rounded border-gray-300">
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${dto.product.id}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700">
+									<img th:src="@{'/uploads/' + ${dto.product.image}}" alt="image"
+										class="h-12 w-12 object-cover rounded">
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${dto.product.name}"></td>
+								<td class="px-4 py-2 text-sm">
+									<span th:class="${dto.stockBadgeClass}" 
+										th:text="${dto.stockDisplay}"></span>
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-700">
+									<span th:if="${dto.product.status}"
+										class="inline-block px-2 py-1 text-xs font-semibold text-white bg-green-500 rounded">Hiện</span>
+									<span th:if="${!dto.product.status}"
+										class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded">Ẩn</span>
+								</td>
+								<td class="px-4 py-2 text-sm text-gray-700"
+									th:text="${#numbers.formatDecimal(dto.product.price, 1, 'COMMA', 2, 'POINT')}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${dto.product.category.name}"></td>
+								<td class="px-4 py-2 space-x-1">
+									<a th:href="@{/admin/edit-product/{id}(id=${dto.product.id})}"
+										class="text-blue-600 hover:underline text-sm" title="Sửa">
+										<i class="fa-solid fa-edit"></i>
+									</a>
+									<a th:href="@{/admin/product/quick-stock/{id}(id=${dto.product.id})}"
+										class="text-green-600 hover:underline text-sm" title="Nhập hàng">
+										<i class="fa-solid fa-box"></i>
+									</a>
+									<form th:action="@{/admin/product/duplicate/{id}(id=${dto.product.id})}" 
+										method="post" style="display:inline;">
+										<button type="submit" class="text-purple-600 hover:underline text-sm" 
+											title="Nhân bản">
+											<i class="fa-solid fa-copy"></i>
+										</button>
+									</form>
+									<a th:href="@{/admin/delete-product/{id}(id=${dto.product.id})}"
+										onclick="return confirm('Bạn có chắc không ?')"
+										class="text-red-600 hover:underline text-sm" title="Xóa">
+										<i class="fa-solid fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Pagination -->
+					<div class="flex justify-end mt-4">
+						<ul class="inline-flex -space-x-px text-sm">
+							<li th:if="${currentPage > 1}"><a
+								th:href="@{'?pageNo=' + ${currentPage - 1}}"
+								class="px-3 py-1 rounded-l bg-gray-100 border border-gray-300 hover:bg-gray-200">&laquo;</a>
+							</li>
+							<li th:each="i:${#numbers.sequence(1, totalPage)}"
+								th:classappend="${currentPage == i ? 'active' : ''}"><a
+								th:href="@{${keyword != null && keyword != '' ? '?keyword=' + keyword + '&' : '?'} + 'pageNo=' + ${i}}"
+								th:text="${i}"
+								class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100"></a>
+							</li>
+							<li th:if="${currentPage < totalPage}"><a
+								th:href="@{'?pageNo=' + ${currentPage + 1}}"
+								class="px-3 py-1 rounded-r bg-gray-100 border border-gray-300 hover:bg-gray-200">&raquo;</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</div>
+	</div>
+
+	<!-- Toast -->
+	<div id="toast"
+		class="fixed bottom-5 right-5 hidden bg-green-600 text-white px-4 py-2 rounded shadow z-50">
+		Đã chọn mục</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+	
+	<script>
+		// Toggle select all checkboxes
+		function toggleSelectAll(source) {
+			const checkboxes = document.querySelectorAll('.product-checkbox');
+			checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+		}
+		
+		// Get selected product IDs
+		function getSelectedIds() {
+			const checkboxes = document.querySelectorAll('.product-checkbox:checked');
+			return Array.from(checkboxes).map(cb => cb.value);
+		}
+		
+		// Bulk update status
+		function bulkUpdateStatus(status) {
+			const ids = getSelectedIds();
+			if (ids.length === 0) {
+				alert('Vui lòng chọn ít nhất một sản phẩm');
+				return;
+			}
+			
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/admin/product/bulk-update-status';
+			
+			ids.forEach(id => {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = 'productIds';
+				input.value = id;
+				form.appendChild(input);
+			});
+			
+			const statusInput = document.createElement('input');
+			statusInput.type = 'hidden';
+			statusInput.name = 'status';
+			statusInput.value = status;
+			form.appendChild(statusInput);
+			
+			document.body.appendChild(form);
+			form.submit();
+		}
+		
+		// Bulk delete
+		function bulkDelete() {
+			const ids = getSelectedIds();
+			if (ids.length === 0) {
+				alert('Vui lòng chọn ít nhất một sản phẩm');
+				return;
+			}
+			
+			if (!confirm(`Bạn có chắc muốn xóa ${ids.length} sản phẩm đã chọn?`)) {
+				return;
+			}
+			
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/admin/product/bulk-delete';
+			
+			ids.forEach(id => {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = 'productIds';
+				input.value = id;
+				form.appendChild(input);
+			});
+			
+			document.body.appendChild(form);
+			form.submit();
+		}
+	</script>
+
+</body>
+</html>

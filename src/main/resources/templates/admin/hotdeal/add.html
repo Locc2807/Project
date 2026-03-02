@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+	<!-- Header -->
+	<header th:replace="admin/fragment/header :: header"></header>
+
+	<!-- Layout -->
+	<div class="flex pt-14 min-h-screen">
+		<!-- Sidebar -->
+		<aside th:replace="admin/fragment/aside :: aside"></aside>
+
+		<!-- Main content -->
+		<main class="flex-1 p-6">
+			<div class="flex justify-between items-center mb-4">
+				<h1 class="text-2xl font-semibold">Thêm Hot Deal</h1>
+				<a th:href="@{/admin/hotdeal}"
+					class="text-sm text-blue-600 hover:underline"> ← Quay lại danh
+					sách </a>
+			</div>
+
+			<form th:action="@{/admin/add-hotdeal}" method="post"
+				th:object="${hotDeal}"
+				class="bg-white p-6 rounded shadow-sm text-sm space-y-4">
+
+				<div>
+					<label for="productId" class="block text-gray-700 font-medium mb-1">Sản
+						phẩm</label> <select id="productId" name="productId"
+						class="w-full border border-gray-300 px-3 py-2 rounded" required>
+						<option value="">-- Chọn sản phẩm --</option>
+						<option th:each="product : ${products}" th:value="${product.id}"
+							th:text="${product.name}" th:attr="data-image=${product.image}"
+							th:selected="${hotDeal.product != null and product.id == hotDeal.product.id}">
+						</option>
+					</select>
+				</div>
+
+				<!-- Ảnh sản phẩm -->
+				<div th:if="${hotDeal.product != null}" class="pt-2">
+					<img th:src="@{'/uploads/' + ${hotDeal.product.image}}"
+						alt="Ảnh sản phẩm" class="w-24 h-24 object-cover rounded border" />
+				</div>
+
+				<div>
+					<label for="discountPercent"
+						class="block text-gray-700 font-medium mb-1">Phần trăm
+						giảm</label> <input type="number" id="discountPercent"
+						th:field="*{discountPercent}"
+						class="w-full border border-gray-300 px-3 py-2 rounded" min="0"
+						max="100" required>
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label for="startDate"
+							class="block text-gray-700 font-medium mb-1">Từ ngày</label> <input
+							type="date" id="startDate" th:field="*{startDate}"
+							class="w-full border border-gray-300 px-3 py-2 rounded" required>
+					</div>
+					<div>
+						<label for="endDate" class="block text-gray-700 font-medium mb-1">Đến
+							ngày</label> <input type="date" id="endDate" th:field="*{endDate}"
+							class="w-full border border-gray-300 px-3 py-2 rounded" required>
+					</div>
+				</div>
+
+				<div>
+					<label class="block text-gray-700 font-medium mb-1">Trạng
+						thái</label>
+					<div class="flex items-center space-x-4">
+						<label class="inline-flex items-center"> <input
+							type="radio" th:field="*{status}" value="1"
+							class="text-green-600"> <span class="ml-2">Hoạt
+								động</span>
+						</label> <label class="inline-flex items-center"> <input
+							type="radio" th:field="*{status}" value="0" class="text-red-600">
+							<span class="ml-2">Ẩn</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="pt-4 flex space-x-2">
+					<button type="submit"
+						class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded">
+						Lưu</button>
+					<a th:href="@{/admin/hotdeal}"
+						class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded inline-block text-center">
+						Huỷ </a>
+				</div>
+			</form>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</main>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

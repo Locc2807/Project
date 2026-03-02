@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="admin/fragment/head :: head"></head>
+<body class="bg-gray-100 font-sans">
+
+	<!-- Topbar -->
+	<div th:replace="admin/fragment/header :: header"></div>
+
+	<!-- Layout -->
+	<div class="flex pt-14 h-screen">
+		<!-- Sidebar -->
+		<div th:replace="admin/fragment/aside :: aside"></div>
+
+		<!-- Main Area -->
+		<div class="flex flex-col flex-1 overflow-y-auto">
+			<main class="flex-1 p-6">
+				<h1 class="text-3xl font-bold text-gray-800 mb-6">Lịch sử Giao dịch Kho</h1>
+
+				<div class="mb-4">
+					<a th:href="@{/admin/inventory}" 
+						class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+						<i class="fa-solid fa-arrow-left"></i> Quay lại
+					</a>
+				</div>
+
+				<!-- Search -->
+				<form th:action="@{/admin/inventory/transactions}" method="get" class="mb-4 flex gap-2">
+					<input type="text" name="keyword" th:value="${keyword}"
+						class="form-control border px-3 py-2 rounded"
+						placeholder="Tìm kiếm theo tên sản phẩm">
+					<button type="submit"
+						class="btn btn-default px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
+						<i class="fa-solid fa-search"></i>
+					</button>
+				</form>
+
+				<!-- Transactions Table -->
+				<div class="bg-white p-6 rounded-xl shadow">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Danh sách giao dịch</h2>
+
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">ID</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Sản phẩm</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Loại</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Số lượng</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Ghi chú</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Người tạo</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Ngày tạo</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200">
+							<tr th:each="transaction : ${transactions}">
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${transaction.id}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${transaction.product.name}"></td>
+								<td class="px-4 py-2 text-sm">
+									<span th:if="${transaction.transactionType.name() == 'IMPORT'}"
+										class="inline-block px-2 py-1 text-xs font-semibold text-white bg-green-500 rounded">
+										Nhập kho
+									</span>
+									<span th:if="${transaction.transactionType.name() == 'EXPORT'}"
+										class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded">
+										Xuất kho
+									</span>
+									<span th:if="${transaction.transactionType.name() == 'ADJUSTMENT'}"
+										class="inline-block px-2 py-1 text-xs font-semibold text-white bg-blue-500 rounded">
+										Điều chỉnh
+									</span>
+								</td>
+								<td class="px-4 py-2 text-sm font-semibold text-gray-700" th:text="${transaction.quantity}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${transaction.note}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700" th:text="${transaction.createdBy}"></td>
+								<td class="px-4 py-2 text-sm text-gray-700"
+									th:text="${#dates.format(transaction.createdDate, 'dd/MM/yyyy HH:mm')}"></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Pagination -->
+					<div class="flex justify-end mt-4">
+						<ul class="inline-flex -space-x-px text-sm">
+							<li th:if="${currentPage > 1}">
+								<a th:href="@{'?pageNo=' + ${currentPage - 1}}"
+									class="px-3 py-1 rounded-l bg-gray-100 border border-gray-300 hover:bg-gray-200">&laquo;</a>
+							</li>
+							<li th:each="i:${#numbers.sequence(1, totalPages)}"
+								th:classappend="${currentPage == i ? 'active' : ''}">
+								<a th:href="@{${keyword != null && keyword != '' ? '?keyword=' + keyword + '&' : '?'} + 'pageNo=' + ${i}}"
+									th:text="${i}"
+									class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100"></a>
+							</li>
+							<li th:if="${currentPage < totalPages}">
+								<a th:href="@{'?pageNo=' + ${currentPage + 1}}"
+									class="px-3 py-1 rounded-r bg-gray-100 border border-gray-300 hover:bg-gray-200">&raquo;</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</main>
+
+			<!-- Footer -->
+			<div th:replace="admin/fragment/footer :: footer"></div>
+		</div>
+	</div>
+
+	<div th:replace="admin/fragment/script :: script"></div>
+
+</body>
+</html>
