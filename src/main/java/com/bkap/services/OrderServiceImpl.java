@@ -20,6 +20,7 @@ import com.bkap.entity.OrderStatusHistory;
 import com.bkap.entity.Orders;
 import com.bkap.entity.Review;
 import com.bkap.exception.InvalidOrderStatusTransitionException;
+import com.bkap.repository.OrderDetailRepository;
 import com.bkap.repository.OrderNoteRepository;
 import com.bkap.repository.OrderRepository;
 import com.bkap.repository.OrderStatusHistoryRepository;
@@ -29,6 +30,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
+	
+	@Autowired
+	private OrderDetailRepository orderDetailRepository;
 	
 	@Autowired
 	private OrderStatusValidator statusValidator;

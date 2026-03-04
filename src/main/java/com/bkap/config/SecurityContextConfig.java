@@ -71,8 +71,12 @@ public class SecurityContextConfig {
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
 	    http.authorizeHttpRequests(auth -> auth
 	            .requestMatchers(
-	                "/", "/deals", "/categories/**", "/laptops/**", "/product/quickview/**", "/smartphones/**", 
-	                "/cameras/**", "/accessories/**",
+	                "/", "/deals", "/categories", "/categories/**", 
+	                "/laptops", "/laptops/**", 
+	                "/smartphones", "/smartphones/**", 
+	                "/cameras", "/cameras/**", 
+	                "/accessories", "/accessories/**",
+	                "/product/quickview/**",
 	                "/user/login", "/user/register", "/user/forgot_password"
 	            ).permitAll()
 	            .requestMatchers("/user/profile", "/orders/**").authenticated()
