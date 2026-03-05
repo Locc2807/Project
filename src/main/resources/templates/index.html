@@ -199,7 +199,7 @@
 															</div>
 														</div>
 														<div class="add-to-cart">
-															<button class="add-to-cart-btn">
+															<button class="add-to-cart-btn" th:attr="data-id=${p.id}">
 																<i class="fa fa-shopping-cart"></i> add to cart
 															</button>
 														</div>
@@ -320,7 +320,7 @@
 															</div>
 														</div>
 														<div class="add-to-cart">
-															<button class="add-to-cart-btn">
+															<button class="add-to-cart-btn" th:attr="data-id=${p.id}">
 																<i class="fa fa-shopping-cart"></i> add to cart
 															</button>
 														</div>
@@ -368,6 +368,78 @@
 		<!-- /NEWSLETTER -->
 		<footer th:replace="layout/footer :: footer"></footer>
 		<script th:replace="layout/script :: script"></script>
+		
+		<!-- Index page specific script -->
+		<script>
+		// Re-initialize add to cart buttons after Slick carousel is ready
+		$(document).ready(function() {
+			// Wait for Slick to initialize
+			setTimeout(function() {
+				console.log('Re-initializing add to cart for index page...');
+				
+				// Remove old listeners and re-attach
+				$('.add-to-cart-btn').off('click').on('click', function(e) {
+					e.preventDefault();
+					const productId = $(this).attr('data-id');
+					const quantity = $(this).attr('data-quantity') || 1;
+					
+					console.log('=== ADD TO CART CLICKED (Index) ===');
+					console.log('Product ID:', productId);
+					console.log('Quantity:', quantity);
+					
+					if (!productId) {
+						console.error('Product ID not found');
+						alert('Lỗi: Không tìm thấy ID sản phẩm');
+						return;
+					}
+
+					const btn = $(this);
+					btn.prop('disabled', true);
+					const originalText = btn.html();
+					btn.html('<i class="fa fa-spinner fa-spin"></i> Đang thêm...');
+
+					const url = '/cart/add/' + productId + '?quantity=' + quantity;
+					console.log('Fetching URL:', url);
+
+					$.ajax({
+						url: url,
+						method: 'POST',
+						dataType: 'json',
+						success: function(data) {
+							console.log('Response data:', data);
+							
+							if (data.success) {
+								$('#cart-count').text(data.totalItems);
+								console.log('Updated cart count to:', data.totalItems);
+								
+								btn.html('<i class="fa fa-check"></i> Đã thêm!');
+								btn.addClass('btn-success');
+								
+								setTimeout(function() {
+									btn.html(originalText);
+									btn.removeClass('btn-success');
+									btn.prop('disabled', false);
+								}, 2000);
+							} else {
+								console.error('Add to cart failed:', data.message);
+								alert(data.message || 'Có lỗi xảy ra');
+								btn.html(originalText);
+								btn.prop('disabled', false);
+							}
+						},
+						error: function(xhr, status, error) {
+							console.error('AJAX error:', status, error);
+							alert('Có lỗi xảy ra khi thêm vào giỏ hàng');
+							btn.html(originalText);
+							btn.prop('disabled', false);
+						}
+					});
+				});
+				
+				console.log('Found', $('.add-to-cart-btn').length, 'add-to-cart buttons on index page');
+			}, 1000); // Wait 1 second for Slick to finish
+		});
+		</script>
 	</div>
 </body>
 </html>

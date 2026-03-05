@@ -1,72 +1,94 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="layout/head :: head"></head>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/extras/spring-security6">
+<head th:replace="layout/head :: head">
+<meta charset="UTF-8">
+<title>Đặt hàng thành công - TechZone</title>
+</head>
+
 <body>
+	<header th:replace="layout/header :: header"></header>
 
-	<!-- Header -->
-	<div th:replace="layout/header :: header"></div>
-
-	<!-- Success Content -->
-	<div class="container mx-auto px-4 py-16">
-		<div class="max-w-2xl mx-auto text-center">
-			<!-- Success Icon -->
-			<div class="mb-6">
-				<div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full">
-					<i class="fa-solid fa-check text-green-600 text-5xl"></i>
-				</div>
-			</div>
-
-			<!-- Success Message -->
-			<h1 class="text-3xl font-bold text-gray-800 mb-4">
-				Đặt hàng thành công!
-			</h1>
-			
-			<p class="text-gray-600 mb-2">
-				Cảm ơn bạn đã đặt hàng. Chúng tôi đã nhận được đơn hàng của bạn.
-			</p>
-
-			<div th:if="${orderCode}" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-				<p class="text-sm text-gray-600 mb-1">Mã đơn hàng của bạn:</p>
-				<p class="text-2xl font-bold text-blue-600" th:text="${orderCode}"></p>
-			</div>
-
-			<div class="bg-gray-50 rounded-lg p-6 mb-6 text-left">
-				<h2 class="font-semibold mb-3">Thông tin đơn hàng:</h2>
-				<ul class="space-y-2 text-gray-600">
-					<li class="flex items-start">
-						<i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
-						<span>Đơn hàng đang được xử lý</span>
-					</li>
-					<li class="flex items-start">
-						<i class="fa-solid fa-envelope text-blue-500 mt-1 mr-2"></i>
-						<span>Email xác nhận đã được gửi đến hộp thư của bạn</span>
-					</li>
-					<li class="flex items-start">
-						<i class="fa-solid fa-truck text-orange-500 mt-1 mr-2"></i>
-						<span>Chúng tôi sẽ liên hệ với bạn để xác nhận và giao hàng</span>
-					</li>
+	<nav id="navigation">
+		<div class="container">
+			<div id="responsive-nav">
+				<ul class="main-nav nav navbar-nav">
+					<li><a th:href="@{/}">Home</a></li>
+					<li><a th:href="@{/deals}">Hot Deals</a></li>
+					<li><a th:href="@{/categories}">Categories</a></li>
+					<li><a th:href="@{/laptops}">Laptops</a></li>
+					<li><a th:href="@{/smartphones}">Smartphones</a></li>
+					<li><a th:href="@{/cameras}">Cameras</a></li>
+					<li><a th:href="@{/accessories}">Accessories</a></li>
 				</ul>
 			</div>
+		</div>
+	</nav>
 
-			<!-- Actions -->
-			<div class="flex flex-col sm:flex-row gap-3 justify-center">
-				<a th:href="@{/user/orders}" 
-					class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
-					<i class="fa-solid fa-list mr-2"></i> Xem đơn hàng của tôi
-				</a>
-				<a th:href="@{/}" 
-					class="inline-block bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
-					<i class="fa-solid fa-home mr-2"></i> Về trang chủ
-				</a>
+	<!-- BREADCRUMB -->
+	<div id="breadcrumb" class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="breadcrumb-header">Đặt hàng thành công</h3>
+					<ul class="breadcrumb-tree">
+						<li><a th:href="@{/}">Trang chủ</a></li>
+						<li><a th:href="@{/cart}">Giỏ hàng</a></li>
+						<li class="active">Thành công</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
+	<!-- /BREADCRUMB -->
 
-	<!-- Footer -->
-	<div th:replace="layout/footer :: footer"></div>
+	<!-- SECTION -->
+	<div class="section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="order-success text-center" style="padding: 50px 0;">
+						<i class="fa fa-check-circle" style="font-size: 100px; color: #28a745; margin-bottom: 30px;"></i>
+						<h2 style="color: #2B2D42; margin-bottom: 20px;">Đặt hàng thành công!</h2>
+						
+						<div th:if="${orderId}" style="background: #f8f9fa; padding: 30px; border-radius: 5px; margin: 30px 0;">
+							<h4 style="color: #2B2D42; margin-bottom: 15px;">Thông tin đơn hàng</h4>
+							<p style="font-size: 16px; margin: 10px 0;">
+								<strong>Mã đơn hàng:</strong> 
+								<span style="color: #D10024; font-size: 18px;" th:text="${orderCode}">ORD-001</span>
+							</p>
+							<p style="font-size: 14px; color: #666;">
+								Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng.
+							</p>
+						</div>
 
-	<!-- Scripts -->
-	<div th:replace="layout/script :: script"></div>
+						<div style="margin-top: 40px;">
+							<a th:href="@{/user/orders}" class="primary-btn" style="margin-right: 10px;">
+								<i class="fa fa-list"></i> Xem đơn hàng của tôi
+							</a>
+							<a th:href="@{/}" class="primary-btn" style="background: #1e1f29;">
+								<i class="fa fa-home"></i> Về trang chủ
+							</a>
+						</div>
 
+						<div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid #ddd;">
+							<h4 style="color: #2B2D42; margin-bottom: 20px;">Bạn có thể quan tâm</h4>
+							<p style="color: #666;">Tiếp tục mua sắm và khám phá thêm nhiều sản phẩm tuyệt vời!</p>
+							<div style="margin-top: 20px;">
+								<a th:href="@{/laptops}" class="btn btn-default btn-sm" style="margin: 5px;">Laptops</a>
+								<a th:href="@{/smartphones}" class="btn btn-default btn-sm" style="margin: 5px;">Smartphones</a>
+								<a th:href="@{/cameras}" class="btn btn-default btn-sm" style="margin: 5px;">Cameras</a>
+								<a th:href="@{/accessories}" class="btn btn-default btn-sm" style="margin: 5px;">Accessories</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /SECTION -->
+
+	<footer th:replace="layout/footer :: footer"></footer>
+	<script th:replace="layout/script :: script"></script>
 </body>
 </html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Test Checkout</title>
+</head>
+<body>
+<h1>TEST CHECKOUT PAGE</h1>
+<p>If you see this, Thymeleaf is working!</p>
+<p>Cart items: <span th:text="${cartItems != null ? cartItems.size() : 'null'}">0</span></p>
+<p>Total: <span th:text="${totalPrice}">0</span></p>
+</body>
+</html>

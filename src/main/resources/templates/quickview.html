@@ -107,11 +107,13 @@
 							<div class="qty-label">
 								Số lượng
 								<div class="input-number">
-									<input type="number" value="1"> <span class="qty-up">+</span>
+									<input type="number" id="quickview-quantity" value="1" min="1"> 
+									<span class="qty-up">+</span>
 									<span class="qty-down">-</span>
 								</div>
 							</div>
-							<button class="add-to-cart-btn">
+							<button class="add-to-cart-btn" th:attr="data-id=${product.id}" 
+								onclick="addToCartFromQuickview()">
 								<i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
 							</button>
 						</div>
@@ -264,7 +266,7 @@
 							</div>
 						</div>
 						<div class="add-to-cart">
-							<button class="add-to-cart-btn">
+							<button class="add-to-cart-btn" th:attr="data-id=${item.id}">
 								<i class="fa fa-shopping-cart"></i> Thêm vào giỏ
 							</button>
 						</div>
@@ -282,5 +284,70 @@
 
 	<footer th:replace="layout/footer :: footer"></footer>
 	<script th:replace="layout/script :: script"></script>
+	
+	<script>
+	// Handle quantity buttons in quickview
+	document.addEventListener('DOMContentLoaded', function() {
+		const qtyInput = document.getElementById('quickview-quantity');
+		const qtyUp = document.querySelector('.qty-up');
+		const qtyDown = document.querySelector('.qty-down');
+		
+		if (qtyUp && qtyInput) {
+			qtyUp.addEventListener('click', function() {
+				qtyInput.value = parseInt(qtyInput.value) + 1;
+			});
+		}
+		
+		if (qtyDown && qtyInput) {
+			qtyDown.addEventListener('click', function() {
+				if (parseInt(qtyInput.value) > 1) {
+					qtyInput.value = parseInt(qtyInput.value) - 1;
+				}
+			});
+		}
+	});
+	
+	// Add to cart from quickview with quantity
+	function addToCartFromQuickview() {
+		const btn = event.target.closest('.add-to-cart-btn');
+		const productId = btn.getAttribute('data-id');
+		const quantity = document.getElementById('quickview-quantity').value;
+		
+		if (!productId) return;
+		
+		btn.disabled = true;
+		const originalText = btn.innerHTML;
+		btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang thêm...';
+		
+		fetch('/cart/add/' + productId + '?quantity=' + quantity, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' }
+		})
+		.then(res => res.json())
+		.then(data => {
+			if (data.success) {
+				document.getElementById('cart-count').innerText = data.totalItems;
+				btn.innerHTML = '<i class="fa fa-check"></i> Đã thêm!';
+				btn.classList.add('btn-success');
+				
+				setTimeout(() => {
+					btn.innerHTML = originalText;
+					btn.classList.remove('btn-success');
+					btn.disabled = false;
+				}, 2000);
+			} else {
+				alert(data.message || 'Có lỗi xảy ra');
+				btn.innerHTML = originalText;
+				btn.disabled = false;
+			}
+		})
+		.catch(err => {
+			console.error('Error:', err);
+			alert('Có lỗi xảy ra');
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		});
+	}
+	</script>
 </body>
 </html>

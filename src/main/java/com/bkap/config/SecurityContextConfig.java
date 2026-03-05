@@ -77,6 +77,8 @@ public class SecurityContextConfig {
 	                "/cameras", "/cameras/**", 
 	                "/accessories", "/accessories/**",
 	                "/product/quickview/**",
+	                "/cart", "/cart/**",
+	                "/checkout", "/checkout/**",
 	                "/user/login", "/user/register", "/user/forgot_password"
 	            ).permitAll()
 	            .requestMatchers("/user/profile", "/orders/**").authenticated()

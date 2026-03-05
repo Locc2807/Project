@@ -45,21 +45,31 @@ public class CheckoutController {
     // Trang checkout
     @GetMapping("/checkout")
     public String checkout(HttpSession session, Model model, RedirectAttributes redirect) {
+        System.out.println("=== CHECKOUT DEBUG ===");
+        System.out.println("Session ID: " + session.getId());
+        
         Cart cart = (Cart) session.getAttribute("cart");
+        System.out.println("Cart from session: " + cart);
         
         if (cart == null || cart.isEmpty()) {
+            System.out.println("Cart is null or empty - redirecting to /cart");
             redirect.addFlashAttribute("error", "Giỏ hàng trống");
             return "redirect:/cart";
         }
+        
+        System.out.println("Cart has " + cart.getTotalItems() + " items");
 
         // Lấy thông tin user nếu đã đăng nhập
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
             String username = auth.getName();
+            System.out.println("User logged in: " + username);
             Customer customer = customerService.findByEmail(username);
             if (customer != null) {
                 model.addAttribute("customer", customer);
             }
+        } else {
+            System.out.println("User not logged in");
         }
 
         model.addAttribute("cart", cart);
@@ -67,6 +77,9 @@ public class CheckoutController {
         model.addAttribute("totalPrice", cart.getTotalPrice());
         model.addAttribute("shippingFee", 0.0); // Miễn phí ship
         model.addAttribute("finalTotal", cart.getTotalPrice());
+        
+        System.out.println("Returning checkout view");
+        System.out.println("=====================");
 
         return "checkout";
     }

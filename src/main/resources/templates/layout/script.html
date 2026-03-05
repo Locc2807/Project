@@ -297,5 +297,93 @@ function updateFilter() {
 	window.location.href = url.toString();
 }
 </script>
+
+	<!-- Add to Cart - Global Script -->
+	<script th:inline="javascript">
+/*<![CDATA[*/
+function initAddToCartButtons() {
+	document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+		btn.addEventListener('click', function (e) {
+			e.preventDefault();
+			const productId = this.getAttribute('data-id');
+			const quantity = this.getAttribute('data-quantity') || 1;
+			
+			console.log('=== ADD TO CART CLICKED ===');
+			console.log('Product ID:', productId);
+			console.log('Quantity:', quantity);
+			
+			if (!productId) {
+				console.error('Product ID not found');
+				alert('Lỗi: Không tìm thấy ID sản phẩm');
+				return;
+			}
+
+			// Disable button
+			this.disabled = true;
+			const originalText = this.innerHTML;
+			this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang thêm...';
+
+			const url = '/cart/add/' + productId + '?quantity=' + quantity;
+			console.log('Fetching URL:', url);
+
+			fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+			.then(res => {
+				console.log('Response status:', res.status);
+				console.log('Response ok:', res.ok);
+				return res.json();
+			})
+			.then(data => {
+				console.log('Response data:', data);
+				
+				if (data.success) {
+					// Update cart count
+					const cartCount = document.getElementById('cart-count');
+					if (cartCount) {
+						cartCount.innerText = data.totalItems;
+						console.log('Updated cart count to:', data.totalItems);
+					} else {
+						console.warn('Cart count element not found');
+					}
+					
+					// Show success message
+					this.innerHTML = '<i class="fa fa-check"></i> Đã thêm!';
+					this.classList.add('btn-success');
+					
+					// Reset button after 2 seconds
+					setTimeout(() => {
+						this.innerHTML = originalText;
+						this.classList.remove('btn-success');
+						this.disabled = false;
+					}, 2000);
+				} else {
+					console.error('Add to cart failed:', data.message);
+					alert(data.message || 'Có lỗi xảy ra');
+					this.innerHTML = originalText;
+					this.disabled = false;
+				}
+			})
+			.catch(err => {
+				console.error('Fetch error:', err);
+				alert('Có lỗi xảy ra khi thêm vào giỏ hàng. Vui lòng thử lại.');
+				this.innerHTML = originalText;
+				this.disabled = false;
+			});
+		});
+	});
+}
+
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", function() {
+	console.log('Initializing add to cart buttons...');
+	initAddToCartButtons();
+	console.log('Found', document.querySelectorAll('.add-to-cart-btn').length, 'add-to-cart buttons');
+});
+/*]]>*/
+</script>
 </body>
 </html>

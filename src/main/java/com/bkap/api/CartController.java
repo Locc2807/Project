@@ -29,13 +29,23 @@ public class CartController {
 			@RequestParam(defaultValue = "1") int quantity,
 			HttpSession session) {
 		
+		System.out.println("=== ADD TO CART DEBUG ===");
+		System.out.println("Product ID: " + id);
+		System.out.println("Quantity: " + quantity);
+		System.out.println("Session ID: " + session.getId());
+		
 		Cart cart = getCart(session);
+		System.out.println("Cart before add - Total items: " + cart.getTotalItems());
 
 		Optional<Product> optionalProduct = productService.findById(id);
 		if (optionalProduct.isPresent()) {
 			Product product = optionalProduct.get();
+			System.out.println("Product found: " + product.getName());
 			cart.addItem(product, quantity);
 			session.setAttribute("cart", cart);
+			
+			System.out.println("Cart after add - Total items: " + cart.getTotalItems());
+			System.out.println("========================");
 			
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", true);
@@ -46,6 +56,8 @@ public class CartController {
 			return ResponseEntity.ok(response);
 		}
 
+		System.out.println("Product NOT found!");
+		System.out.println("========================");
 		return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Không tìm thấy sản phẩm"));
 	}
 
@@ -100,7 +112,14 @@ public class CartController {
 	// Trang giỏ hàng
 	@GetMapping("/cart")
 	public String viewCart(HttpSession session, Model model) {
+		System.out.println("=== VIEW CART DEBUG ===");
+		System.out.println("Session ID: " + session.getId());
+		
 		Cart cart = getCart(session);
+		System.out.println("Cart total items: " + cart.getTotalItems());
+		System.out.println("Cart items: " + cart.getCartItems().size());
+		System.out.println("======================");
+		
 		model.addAttribute("cart", cart);
 		model.addAttribute("cartItems", cart.getCartItems());
 		model.addAttribute("totalPrice", cart.getTotalPrice());
